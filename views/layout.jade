@@ -1,0 +1,12 @@
+doctype 5
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+
+	body
+		p.pagination-centered 
+			a( href="/campaigns") See all Campaigns |
+			a( href="/deleteall") Delete All Data 
+		block content

@@ -1,0 +1,23 @@
+%center {
+  text-align: center;
+}
+
+$grayLighter: #f3f3f3;
+
+.page-title, .strategy-description {
+  @extend %center;
+}
+
+.goal {
+  background: $grayLighter;
+  // padding: 2em;
+  margin-bottom: 2em;
+}
+
+.goal-title {
+  @extend %center;
+}
+
+.action-title {
+  font-size: 1em;
+}

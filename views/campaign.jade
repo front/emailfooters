@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	.container
+		div.page
+			h1.page-title.campaign-title= title
+			p.description.campaign-description= campaign.vision
+			form(name="input", action="/campaign/" + campaign.title, method="post",class="pagination-centered")
+				input(type="text", name="goal",required="required",placeholder="Insert new goal")
+			ul.goal
+				each goal in campaign.goals 
+					li
+						h1.title.goal-title= goal
+						form(name="remove", action="/campaign/" + campaign.title, method="post",class="pagination-centered")
+							input(type="hidden",value=goal)
+							input(type="submit", value="delete")
+						

@@ -1,0 +1,15 @@
+/* line 1, ../sass/style.scss */
+.page-title, .strategy-description, .goal-title {
+  text-align: center;
+}
+
+/* line 11, ../sass/style.scss */
+.goal {
+  background: #f3f3f3;
+  margin-bottom: 2em;
+}
+
+/* line 21, ../sass/style.scss */
+.action-title {
+  font-size: 1em;
+}
