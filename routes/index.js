@@ -2,37 +2,165 @@ var mongoose = require('mongoose'),
 Campaign = require('../models/Campaign');
 var fs = require('fs');
 var path = require('path');
+var utils = require('../lib/utils');
+var join = require('path').join;
+var request = require('request');
 
 // Connect to DB
 mongoose.connect('mongodb://localhost/Campaign');
 
-exports.index = function(req, res){
-	res.render('index', {});
-};
 
-exports.post = function(req, res){
 
-	// Save file if it exists
-	if (req.files.image.name && req.files.image.name !== ''){
 
-		// Get file from post request
-		fs.readFile(req.files.image.path, function (err, data) {
 
-			// Set path for new file
-			var newPath = path.join( __dirname, "../uploads/", req.files.image.name);
+module.exports = function(app){
 
-			fs.writeFile(newPath, data, function (err) {
-				if(err) {
-					console.log('error saving file:');
-					console.log(err);
-				} else {
-					console.log('Saved file: ' + newPath);
-					req.body.imageURL = newPath;
-				}
-			});
-		});
-	}
+  var rasterizerService = app.settings.rasterizerService;
+  var fileCleanerService = app.settings.fileCleanerService;
 
-	// Send the 
-	res.render('index', req.body);
-};
+
+  app.get('/', function(req,res, next){
+    res.render('index', {});
+  });
+
+  app.post('/', function (req,res, next){
+    if (req.files.image.name && req.files.image.name !== ''){
+      fs.readFile(req.files.image.path, function (err, data) {
+        var newPath = path.join( __dirname, "../uploads/", req.files.image.name);
+        fs.writeFile(newPath, data, function (err) {
+          if(err) {
+            console.log('error saving file:');
+            console.log(err);
+          } else {
+            console.log('Saved file: ' + newPath);
+            req.body.imageURL = newPath;
+          }
+        });
+      });
+    }
+
+    res.render('index', req.body);
+  });
+
+  // Catches the screenshot callback
+  app.post('/screenshotCallback', function(req,res,next){
+    req.on('end', function(){
+      //console.log(req);
+      res.writeHead(200);
+      res.end();
+    });
+    console.log('foo');
+    req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
+
+
+  });
+
+
+  app.get('/test', function(req,res, next){
+    var url = 'http://google.com';
+    // required options
+    var options = {
+      uri: 'http://localhost:' + rasterizerService.getPort() + '/',
+      headers: { url: url }
+    };
+    ['width', 'height', 'clipRect', 'javascriptEnabled', 'loadImages', 'localToRemoteUrlAccessEnabled', 'userAgent', 'userName', 'password', 'delay'].forEach(function(name) {
+      if (req.param(name, false)) options.headers[name] = req.param(name);
+    });
+
+    var filename = 'screenshot_' + utils.md5(url + JSON.stringify(options)) + '.png';
+    options.headers.filename = filename;
+
+    var filePath = join(rasterizerService.getPath(), filename);
+
+    var callbackUrl = req.param('callback', false) ? utils.url(req.param('callback')) : false;
+    callbackUrl='http://localhost:3000/screenshotCallback';
+    console.log('callbackURL is now=' + callbackUrl);
+
+    
+    if (path.existsSync(filePath)) {
+      console.log('Request for %s - Found in cache', url);
+      processImageUsingCache(filePath, res, callbackUrl, function(err) { if (err) next(err); });
+      return;
+    }
+    console.log('Request for %s - Rasterizing it', url);
+    console.log(callbackUrl);
+    processImageUsingRasterizer(options, filePath, res, callbackUrl, function(err) { if(err) next(err); });
+  });
+
+
+
+
+
+
+
+
+// Helper functions
+
+
+var processImageUsingCache = function(filePath, res, url, callback) {
+  if (url) {
+      // asynchronous
+      res.send('Will post screenshot to ' + url + ' when processed');
+      console.log(url);
+
+      postImageToUrl(filePath, url, callback);
+    } else {
+      // synchronous
+      sendImageInResponse(filePath, res, callback);
+    }
+  }
+
+  var processImageUsingRasterizer = function(rasterizerOptions, filePath, res, url, callback) {
+    if (url) {
+      // asynchronous
+      res.send('Will post screenshot to ' + url + ' when processed');
+      callRasterizer(rasterizerOptions, function(error) {
+        if (error) return callback(error);
+        postImageToUrl(filePath, url, callback);
+      });
+    } else {
+      // synchronous
+      callRasterizer(rasterizerOptions, function(error) {
+        if (error) return callback(error);
+        sendImageInResponse(filePath, res, callback);
+      });
+    }
+  }
+
+  var callRasterizer = function(rasterizerOptions, callback) {
+    request.get(rasterizerOptions, function(error, response, body) {
+      if (error || response.statusCode != 200) {
+        console.log('Error while requesting the rasterizer: %s', error.message);
+        rasterizerService.restartService();
+        return callback(new Error(body));
+      }
+      callback(null);
+    });
+  }
+
+  var postImageToUrl = function(imagePath, url, callback) {
+    console.log('Streaming image to %s', url);
+    var fileStream = fs.createReadStream(imagePath);
+    fileStream.on('end', function() {
+      console.log('Readfile!');
+      fileCleanerService.addFile(imagePath);
+    });
+    fileStream.on('error', function(err){
+      console.log('Error while reading file: %s', err.message);
+      callback(err);
+    });
+    fileStream.pipe(request.post(url, function(err) {
+      console.log('piped file!');
+      if (err) console.log('Error while streaming screenshot: %s', err);
+      callback(err);
+    }));
+  }
+
+  var sendImageInResponse = function(imagePath, res, callback) {
+    console.log('Sending image in response');
+    res.sendfile(imagePath, function(err) {
+      fileCleanerService.addFile(imagePath);
+      callback(err);
+    });
+  }
+}

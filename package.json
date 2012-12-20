@@ -9,7 +9,8 @@
     "express": "3.0.1",
     "mongoose": "3.5.2",
     "ejs": "0.8.3",
-    "node-raphael": ">= 0.1.7"
+    "request": "*",
+    "config": "*"
   }
 }
 
