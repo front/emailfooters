@@ -5,7 +5,7 @@
 	<link href="bootstrap/css/bootstrap.css" rel="stylesheet"/>
 	<link href="stylesheets/style.css" rel="stylesheet"/>
 	<script src="javascripts/jquery-1.8.3.min.js"></script>
-
+	<script src="javascripts/scripts.js"></script>
 </head>
 <body>
 	<div class="span6" id="ad-form">
@@ -16,12 +16,13 @@
 		<% var title_value = typeof title !== 'undefined' ? 'value=' + title : ''; %>
 		<% var body_value = typeof body !== 'undefined' ? 'value='+body : ''; %>
 
-		<form class="navbar-form pull-left" action="/" method="post" enctype="multipart/form-data">
-			<input type="text" name='title' placeholder="Title" <%= title_value %>><br/>
-			<textarea rows="3" name='body' placeholder="Body" <%= body_value %>></textarea><br/>
-			<input type="text" name='url' placeholder="URL"><br/>
+		<form id="form" class="navbar-form pull-left" action="/" method="post" enctype="multipart/form-data">
+			<input class="title" type="text" name='title' placeholder="Title" <%= title_value %>><br/>
+			<textarea rows="3" class="body" placeholder="Body" <%= body_value %>></textarea><br/>
+			<input class="url" type="text" name='url' placeholder="URL"><br/>
 			<label class="checkbox">
-      <input type="checkbox"> Use logo</label>
+				<input name="addlogo" type="checkbox"> Use logo
+			</label>
 			<input type="text" name='schedule' placeholder="Schedule"><br/>
 			<input type="text" name='internal_title' placeholder="Internal Title"><br/>
 			<input type="file" name="image"><br />
@@ -30,20 +31,22 @@
 	</div>
 
 
-	<div id="ad-preview" class="span6">
+	<div id="preview" class="span6">
+		<a class="url" href="">
+			<h1 class="title"></h1>
+			<div class="body"></div>
+		</a>
+	</div>
+		<!-- 
 		<% if (typeof title !== 'undefined'){ %>
-		<h1 id="title"><%= title %></h1>
+		<h1 class="title"><%= title %></h1>
 		<% } %>
 		<% if (typeof body !== 'undefined'){ %>
-		<div id="body" ><%= body %></div>
+		<div class="body" ><%= body %></div>
 		<% } %>
-
-
-
 		<% if (typeof imageURL !== 'undefined'){ %>
 		<img src="<% imageURL %>" />
-			<% } %>
-
+		<% } %> -->
 	</div>
 </body>
 </html>

@@ -4,13 +4,14 @@ var Schema = mongoose.Schema;
 
 
 var Campaign = new Schema({ 
-	title: 'string',
-	body: 'string', 
-	url: 'string', 
-	image: 'string', 
-	addloop: 'string', 
-	schedule: 'string', 
-	internal_title: 'string', 
+	title: String,
+	body: String, 
+	url: String, 
+	image: String, 
+	addlogo: Boolean, 
+	schedule: String, 
+	internal_title: String, 
+	image: String
 });
 // var Campaign = mongoose.model('Campaign', Campaign);
 

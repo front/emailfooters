@@ -22,9 +22,12 @@ module.exports = function(app){
   app.get('/', function(req,res, next){
     res.render('index', {});
   });
-
   app.post('/', function (req,res, next){
-    if (req.files.image.name && req.files.image.name !== ''){
+
+    // File handling
+    if ( typeof req.files.image !== 'undefined'){
+      console.log('Will try to save image');
+      console.log(req.files.image);
       fs.readFile(req.files.image.path, function (err, data) {
         var newPath = path.join( __dirname, "../uploads/", req.files.image.name);
         fs.writeFile(newPath, data, function (err) {
@@ -33,30 +36,65 @@ module.exports = function(app){
             console.log(err);
           } else {
             console.log('Saved file: ' + newPath);
-            req.body.imageURL = newPath;
+            req.body.image = newPath;
           }
         });
       });
-    }
+    } // File handling end
+    console.log(req.body);
+    campaign = new Campaign();
+    campaign.title = req.body.title || '';
+    campaign.body = req.body.body || '';
+    campaign.url = req.body.url || '';
+    campaign.schedule = req.body.schedule || '';
+    campaign.internal_title = req.body.internal_title || '';
+    campaign.addlogo = req.body.addlogo || '';
+    campaign.image = req.body.image || '';
+
+
+    campaign.save(function(err){
+      if(err){
+        console.log(err);
+      } else {
+        console.log('Saved Campaign');
+      }
+    });
 
     res.render('index', req.body);
   });
+
+app.get('/campaigns', function(req,res,next){
+  Campaign
+  .find()
+  .exec( function(err,campaigns){
+    if(err){
+      console.log(err);
+    } else {
+      console.log(campaigns);
+      res.render('campaigns',{campaigns: campaigns});
+
+    }
+  }
+  );
+  //res.end('not found');
+});
+
 
   // Catches the screenshot callback
   app.post('/screenshotCallback', function(req,res,next){
     req.on('end', function(){
       //console.log(req);
-      res.writeHead(200);
+      res.send('foobar');
+      //res.writeHead(200);
+
       res.end();
     });
+    res.send('bazbaz');
+
     console.log('foo');
     req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
-
-
   });
-
-
-  app.get('/test', function(req,res, next){
+  app.get('/getScreenshot', function(req,res, next){
     var url = 'http://google.com';
     // required options
     var options = {
@@ -73,10 +111,10 @@ module.exports = function(app){
     var filePath = join(rasterizerService.getPath(), filename);
 
     var callbackUrl = req.param('callback', false) ? utils.url(req.param('callback')) : false;
-    callbackUrl='http://localhost:3000/screenshotCallback';
+    //callbackUrl='http://localhost:3000/screenshotCallback';
     console.log('callbackURL is now=' + callbackUrl);
 
-    
+
     if (path.existsSync(filePath)) {
       console.log('Request for %s - Found in cache', url);
       processImageUsingCache(filePath, res, callbackUrl, function(err) { if (err) next(err); });
@@ -89,18 +127,11 @@ module.exports = function(app){
 
 
 
-
-
-
-
-
 // Helper functions
-
-
 var processImageUsingCache = function(filePath, res, url, callback) {
   if (url) {
       // asynchronous
-      res.send('Will post screenshot to ' + url + ' when processed');
+      //res.send('Will post screenshot to ' + url + ' when processed');
       console.log(url);
 
       postImageToUrl(filePath, url, callback);
@@ -113,7 +144,7 @@ var processImageUsingCache = function(filePath, res, url, callback) {
   var processImageUsingRasterizer = function(rasterizerOptions, filePath, res, url, callback) {
     if (url) {
       // asynchronous
-      res.send('Will post screenshot to ' + url + ' when processed');
+      //res.send('Will post screenshot to ' + url + ' when processed');
       callRasterizer(rasterizerOptions, function(error) {
         if (error) return callback(error);
         postImageToUrl(filePath, url, callback);
