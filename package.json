@@ -6,9 +6,10 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
-    "express": "3.0.1",
-    "mongoose": "3.5.2",
-    "ejs": "0.8.3",
+    "express": ">=3.0.1",
+    "mongoose": ">=3.5.2",
+    "mongoose-auth": ">=0.0.12",
+    "ejs": ">=0.8.3",
     "request": "*",
     "config": "*"
   }
