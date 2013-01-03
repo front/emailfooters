@@ -1,25 +1,24 @@
 <html>
 
-<head>
-	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
-	<link href="bootstrap/css/bootstrap.css" rel="stylesheet"/>
-	<link href="stylesheets/style.css" rel="stylesheet"/>
-	<script src="javascripts/jquery-1.8.3.min.js"></script>
-	<script src="javascripts/scripts.js"></script>
-</head>
-<body>
-	<div class="span6" id="ad-form">
-		<h1>
-			Create your ad
-		</h1> 
 
-		<% var title_value = typeof title !== 'undefined' ? 'value=' + title : ''; %>
-		<% var body_value = typeof body !== 'undefined' ? 'value='+body : ''; %>
+<% include header %>
+
+
+<body>
+	<% include navigation %>
+
+	<div class="span6" id="ad-form">
+		<h1>Create your ad</h1> 
+		<% console.log("body: " + body); %>
+		<% var title_value = typeof title !== 'undefined' 
+		? "value='" + title + "'" 
+		: ''; %>
+		<% var body_value = typeof body !== 'undefined' ?  body : ''; %>
 
 		<form id="form" class="navbar-form pull-left" action="/" method="post" enctype="multipart/form-data">
-			<input class="title" type="text" name='title' placeholder="Title" <%= title_value %>><br/>
-			<textarea rows="3" class="body" placeholder="Body" <%= body_value %>></textarea><br/>
-			<input class="url" type="text" name='url' placeholder="URL"><br/>
+			<input 		name='title' 	class="title" 	type="text"  placeholder='Title' <%= title_value %>><br/>
+			<textarea 	name='body' 	rows='3'  		class='body' placeholder='Body'><%= body_value %></textarea><br/>
+			<input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/>
 			<label class="checkbox">
 				<input name="addlogo" type="checkbox"> Use logo
 			</label>
@@ -33,10 +32,20 @@
 
 	<div id="preview" class="span6">
 		<a class="url" href="">
-			<h1 class="title"></h1>
+			<h1 class="title" data-bind="text: firstName"></h1>
 			<div class="body"></div>
 		</a>
 	</div>
+
+<p>First name: <strong data-bind="text: title"></strong></p>
+
+	<script>
+	function AppViewModel() {
+		this.title = ko.observable("Title");
+		this.lastName = ko.observable("Bertington");
+	}
+	ko.applyBindings(new AppViewModel());
+	</script>
 		<!-- 
 		<% if (typeof title !== 'undefined'){ %>
 		<h1 class="title"><%= title %></h1>

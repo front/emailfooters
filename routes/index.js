@@ -1,10 +1,13 @@
-var mongoose = require('mongoose'),
-Campaign = require('../models/Campaign');
+var Campaign = require('../models/Campaign');
+
+// Needed modules
+var mongoose = require('mongoose');
 var fs = require('fs');
 var path = require('path');
 var utils = require('../lib/utils');
 var join = require('path').join;
 var request = require('request');
+var url = require('url');
 
 // Connect to DB
 mongoose.connect('mongodb://localhost/Campaign');
@@ -22,12 +25,14 @@ module.exports = function(app){
   app.get('/', function(req,res, next){
     res.render('index', {});
   });
+  app.get('/add', function(req,res, next){
+    res.render('index', {});
+  });
   app.post('/', function (req,res, next){
 
     // File handling
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
-      console.log(req.files.image);
       fs.readFile(req.files.image.path, function (err, data) {
         var newPath = path.join( __dirname, "../uploads/", req.files.image.name);
         fs.writeFile(newPath, data, function (err) {
@@ -41,7 +46,8 @@ module.exports = function(app){
         });
       });
     } // File handling end
-    console.log(req.body);
+
+
     campaign = new Campaign();
     campaign.title = req.body.title || '';
     campaign.body = req.body.body || '';
@@ -63,6 +69,7 @@ module.exports = function(app){
     res.render('index', req.body);
   });
 
+
 app.get('/campaigns', function(req,res,next){
   Campaign
   .find()
@@ -70,13 +77,25 @@ app.get('/campaigns', function(req,res,next){
     if(err){
       console.log(err);
     } else {
-      console.log(campaigns);
       res.render('campaigns',{campaigns: campaigns});
-
     }
   }
   );
   //res.end('not found');
+});
+
+app.get('/campaign/:id?', function (req,res,next){
+  console.log(req.params.id);
+
+  var query = Campaign.findOne({'_id': req.params.id});
+  query.exec(function(err,campaign){
+    if(err) return 'No campaign found with that id';
+    console.log('Found campaign!');
+    console.log(campaign);
+  res.render('index', campaign);
+
+  });
+
 });
 
 
@@ -91,7 +110,6 @@ app.get('/campaigns', function(req,res,next){
     });
     res.send('bazbaz');
 
-    console.log('foo');
     req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
   });
   app.get('/getScreenshot', function(req,res, next){

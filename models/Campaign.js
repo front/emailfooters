@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var mongooseAuth = require('mongoose-auth');
+
 var Schema = mongoose.Schema;
 
 
@@ -13,6 +15,11 @@ var Campaign = new Schema({
 	internal_title: String, 
 	image: String
 });
+
+// Campaign.plugin(mongooseAuth, {
+// 	facebook: true
+// });
+
 // var Campaign = mongoose.model('Campaign', Campaign);
 
 // var testCamp = new Campaign({ 
