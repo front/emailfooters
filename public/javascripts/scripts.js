@@ -9,19 +9,19 @@ $('#take-screenshot').live('click',function(){
 });
 
 
-$('#form .title').live('input',function(){
-	txt = $(this).val();
-	txt = txt.replace(/\n\r?/g, '<br />'); 
-	$('#preview .title').html (txt);
-});
+// $('#form .title').live('input',function(){
+// 	txt = $(this).val();
+// 	txt = txt.replace(/\n\r?/g, '<br />'); 
+// 	$('#preview .title').html (txt);
+// });
 
-$('#form .body').live('input',function(){
-	txt = $(this).val();
-	txt = txt.replace(/\n\r?/g, '<br />'); 
-	$('#preview .body').html ( txt );
-});
+// $('#form .body').live('input',function(){
+// 	txt = $(this).val();
+// 	txt = txt.replace(/\n\r?/g, '<br />'); 
+// 	$('#preview .body').html ( txt );
+// });
 
-$('#form .url').live('input',function(){
-	url = $(this).val();
-	$('#preview .url').attr ( 'href', url );
-});
+// $('#form .url').live('input',function(){
+// 	url = $(this).val();
+// 	$('#preview .url').attr ( 'href', url );
+// });

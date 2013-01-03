@@ -16,8 +16,8 @@
 		<% var body_value = typeof body !== 'undefined' ?  body : ''; %>
 
 		<form id="form" class="navbar-form pull-left" action="/" method="post" enctype="multipart/form-data">
-			<input 		name='title' 	class="title" 	type="text"  placeholder='Title' <%= title_value %>><br/>
-			<textarea 	name='body' 	rows='3'  		class='body' placeholder='Body'><%= body_value %></textarea><br/>
+			<input 		name='title' class="title" 	type="text"  placeholder='Title' data-bind="attr:{value: title}"><br/>
+			<textarea 	name='body' rows='3'  	class='body' placeholder='Body' data-bind="text: body"></textarea><br/>
 			<input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/>
 			<label class="checkbox">
 				<input name="addlogo" type="checkbox"> Use logo
@@ -31,18 +31,18 @@
 
 
 	<div id="preview" class="span6">
-		<a class="url" href="">
-			<h1 class="title" data-bind="text: firstName"></h1>
-			<div class="body"></div>
+		<a class="url" data-bind="attr:{href:url}">
+			<h1 class="title" data-bind="text: title"></h1>
+			<div class="body" data-bind="text: body"></div>
 		</a>
 	</div>
 
-<p>First name: <strong data-bind="text: title"></strong></p>
 
 	<script>
 	function AppViewModel() {
-		this.title = ko.observable("Title");
-		this.lastName = ko.observable("Bertington");
+		this.url = ko.observable("http://vg.no");
+		this.title = ko.observable("Foo");
+		this.body = ko.observable("Bar");
 	}
 	ko.applyBindings(new AppViewModel());
 	</script>
