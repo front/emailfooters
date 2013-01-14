@@ -22,6 +22,12 @@ module.exports = function(app){
   var fileCleanerService = app.settings.fileCleanerService;
 
 
+  app.get('/deleteall', function(req,res,next){
+    Campaign.collection.drop();
+    res.redirect('/');
+  });
+
+
   app.get('/', function(req,res, next){
     res.render('index', {});
   });
