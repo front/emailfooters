@@ -9,9 +9,11 @@
 			<tr>
 				<th>Title</th>
 				<th>Body</th>
-				<th>Internal Title</th>
-				<th>Image</th>
+<!-- 				<th>Internal Title</th>
+				<th>Image</th> -->
 				<th>Edit</th>
+				<th>Render page</th>
+				<th>Finished screenshot</th>
 
 			</tr>
 		</thead>
@@ -19,10 +21,11 @@
 		<tr>
 			<td><%= campaigns[i].title %></td>
 			<td><%= campaigns[i].body %></td>
-			<td><%= campaigns[i].internal_title %></td>
-			<td><%= campaigns[i].image %></td>
-
+<!-- 			<td><%= campaigns[i].internal_title %></td>
+			<td><%= campaigns[i].image %></td> -->
 			<td><a href="/campaign/<%= campaigns[i]._id %>">Edit</a></td>
+			<td><a href="/campaign/render/<%= campaigns[i]._id %>">View</a></td>
+			<td><a href="/campaign/screenshot/<%= campaigns[i]._id %>">View</a></td>
 
 
 		</tr>
