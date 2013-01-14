@@ -132,8 +132,8 @@ module.exports = function(app){
 
     req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
   });
-  app.get('/getScreenshot', function(req,res, next){
-    var url = 'http://localhost:3000/campaign/render/50e564ed05b9a67360000001';
+  app.get('/campaign/screenshot/:id?', function(req,res, next){
+    var url = 'http://localhost:3000/campaign/render/' + req.params.id;
     // required options
     var options = {
       uri: 'http://localhost:' + rasterizerService.getPort() + '/',
