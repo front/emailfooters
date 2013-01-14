@@ -29,23 +29,20 @@ module.exports = function(app){
     res.render('index', {});
   });
   app.post('/', function (req,res, next){
-
-    // File handling
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
       fs.readFile(req.files.image.path, function (err, data) {
         var newPath = path.join( __dirname, "../uploads/", req.files.image.name);
         fs.writeFile(newPath, data, function (err) {
-          if(err) {
-            console.log('error saving file:');
-            console.log(err);
+          if (err) {
+            console.log( err );
           } else {
             console.log('Saved file: ' + newPath);
             req.body.image = newPath;
           }
         });
       });
-    } // File handling end
+    } 
 
 
     campaign = new Campaign();
@@ -69,34 +66,48 @@ module.exports = function(app){
     res.render('index', req.body);
   });
 
-
-app.get('/campaigns', function(req,res,next){
-  Campaign
-  .find()
-  .exec( function(err,campaigns){
-    if(err){
-      console.log(err);
-    } else {
-      res.render('campaigns',{campaigns: campaigns});
+  // Campaign list
+  app.get('/campaigns', function(req,res,next){
+    Campaign
+    .find()
+    .exec( function(err,campaigns){
+      if(err){
+        console.log(err);
+      } else {
+        res.render('campaigns',{campaigns: campaigns});
+      }
     }
-  }
-  );
-  //res.end('not found');
-});
+    );
+  });
 
-app.get('/campaign/:id?', function (req,res,next){
-  console.log(req.params.id);
+  // One specific campaign
+  app.get('/campaign/:id?', function (req,res,next){
+    console.log(req.params.id);
 
-  var query = Campaign.findOne({'_id': req.params.id});
-  query.exec(function(err,campaign){
-    if(err) return 'No campaign found with that id';
-    console.log('Found campaign!');
-    console.log(campaign);
-  res.render('index', campaign);
+    var query = Campaign.findOne({'_id': req.params.id});
+    query.exec(function(err,campaign){
+      if(err) return 'No campaign found with that id';
+      console.log('Found campaign!');
+      console.log(campaign);
+      res.render('index', campaign);
+
+    });
 
   });
 
-});
+  // Rendered output for a single campaign that will be used for screenshot
+  app.get('/campaign/render/:id', function(req,res,next){
+    Campaign
+    .findOne({ '_id': req.params.id})
+    .exec( function(err,campaign){
+      if(err){
+        console.log(err);
+      } else {
+        res.render('render',{campaign: campaign});
+      }
+    }
+    );
+  });
 
 
   // Catches the screenshot callback
@@ -113,14 +124,20 @@ app.get('/campaign/:id?', function (req,res,next){
     req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
   });
   app.get('/getScreenshot', function(req,res, next){
-    var url = 'http://google.com';
+    var url = 'http://localhost:3000/campaign/render/50e564ed05b9a67360000001';
     // required options
     var options = {
       uri: 'http://localhost:' + rasterizerService.getPort() + '/',
       headers: { url: url }
     };
+    // console.log(rasterizerService.getPort());
     ['width', 'height', 'clipRect', 'javascriptEnabled', 'loadImages', 'localToRemoteUrlAccessEnabled', 'userAgent', 'userName', 'password', 'delay'].forEach(function(name) {
       if (req.param(name, false)) options.headers[name] = req.param(name);
+      options.headers['width'] = '1';
+      options.headers['height'] = '1';
+
+      console.log( 'paramaters:' );
+      console.log( req );
     });
 
     var filename = 'screenshot_' + utils.md5(url + JSON.stringify(options)) + '.png';
