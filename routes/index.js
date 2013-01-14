@@ -1,4 +1,5 @@
 var Campaign = require('../models/Campaign');
+var User = require('../models/Campaign');
 
 // Needed modules
 var mongoose = require('mongoose');
@@ -10,10 +11,14 @@ var request = require('request');
 var url = require('url');
 
 // Connect to DB
-mongoose.connect('mongodb://localhost/Campaign');
+mongoose.connect('mongodb://localhost/Emailads');
 
 
-
+// dev - Create a default user
+var defaultUser = new User({ username: 'defaultUser' });
+defaultUser.save(function (err) {
+  if (err) console.log(err);
+})
 
 
 module.exports = function(app){
@@ -26,12 +31,7 @@ module.exports = function(app){
     Campaign.collection.drop();
     res.redirect('/');
   });
-
-
   app.get('/', function(req,res, next){
-    res.render('index', {});
-  });
-  app.get('/add', function(req,res, next){
     res.render('index', {});
   });
   app.post('/', function (req,res, next){
@@ -49,8 +49,6 @@ module.exports = function(app){
         });
       });
     } 
-
-
     campaign = new Campaign();
     campaign.title = req.body.title || '';
     campaign.body = req.body.body || '';
@@ -68,10 +66,7 @@ module.exports = function(app){
         console.log('Saved Campaign');
       }
     });
-
     res.redirect('/campaign/' + campaign._id);
-
-
     // res.render('index', req.body);
   });
 
@@ -89,7 +84,7 @@ module.exports = function(app){
     );
   });
 
-  // One specific campaign
+  // Show One specific campaign
   app.get('/campaign/:id?', function (req,res,next){
     console.log(req.params.id);
 
@@ -101,7 +96,6 @@ module.exports = function(app){
       res.render('index', campaign);
 
     });
-
   });
 
   // Rendered output for a single campaign that will be used for screenshot
@@ -118,7 +112,6 @@ module.exports = function(app){
     );
   });
 
-
   // Catches the screenshot callback
   app.post('/screenshotCallback', function(req,res,next){
     req.on('end', function(){
@@ -132,6 +125,8 @@ module.exports = function(app){
 
     req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
   });
+
+  // Shows the actual screenshot
   app.get('/campaign/screenshot/:id?', function(req,res, next){
     var url = 'http://localhost:3000/campaign/render/' + req.params.id;
     // required options

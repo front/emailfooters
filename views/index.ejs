@@ -8,7 +8,7 @@
 	<% include navigation %>
 
 	<div class="span6" id="ad-form">
-		<h1>Create your ad</h1> 
+		<h1>Create your campaign</h1> 
 		<% var title_value = typeof title !== 'undefined' 
 		? "value='" + title + "'" 
 		: ''; %>
@@ -16,20 +16,19 @@
 
 		<form id="form" class="navbar-form pull-left" action="/" method="post" enctype="multipart/form-data">
 			<input 
-				name='title' 
-				class="title" 	
-				type="text"  
-				placeholder='Title'
-				<% if(typeof title !== 'undefined') { %>
-					value="<%= title %>"
-				<% } %>
+			name='title' 
+			class="title" 	
+			type="text"  
+			placeholder='Title'
+			<% if(typeof title !== 'undefined') { %>
+			value="<%= title %>"
+			<% } %>
 			><br/>
 			<textarea
-				name='body' 
-				rows='3'  	
-				class='body' 
-				placeholder='Body'
-				></textarea><br/>
+			name='body' 
+			rows='3'  	
+			class='body' 
+			placeholder='Body'><% if(typeof body !== 'undefined') { %><%= body %><% } %></textarea><br/>
 <!-- 			<input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/>
 			<label class="checkbox">
 				<input name="addlogo" type="checkbox"> Use logo
@@ -44,27 +43,22 @@
 
 	<div id="preview" class="span6">
 		<a class="url" data-bind="attr:{href:url}">
-			<h1 class="title" data-bind="text: title">
-				<% if(typeof title !== 'undefined') { %>
-				<%= title %></h1>
-				<% } %>
+			
+			<% if(typeof title !== 'undefined') { %>
+			<h1 class="title" data-bind="text: title"><%= title %></h1>
+			<% } %>
 
-				<div class="body" data-bind="text: body">
-					<% if(typeof body !== 'undefined') { %>
-					<%= body %></h1>
-					<% } %>		
-				</a>
-			</div>
+			<% if(typeof body !== 'undefined') { %>
+			<div class="body" data-bind="text: body"><%= body %>
+				<% } %>		
+		</a>
+		<% if(typeof _id !== 'undefined') { %> 
+		<img id="embedlink"><input type='text' readonly value='<img src="http://localhost:3000/campaign/screenshot/<%= _id %>">' /></form>
+		<% } %>
+
+		</div>
 
 
-			<script>
-	// function AppViewModel() {
-	// 	this.url = ko.observable("http://vg.no");
-	// 	this.title = ko.observable("Foo");
-	// 	this.body = ko.observable("Bar");
-	// }
-	// ko.applyBindings(new AppViewModel());
-	</script>
 		<!-- 
 		<% if (typeof title !== 'undefined'){ %>
 		<h1 class="title"><%= title %></h1>
