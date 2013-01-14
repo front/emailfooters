@@ -69,7 +69,10 @@ module.exports = function(app){
       }
     });
 
-    res.render('index', req.body);
+    res.redirect('/campaign/' + campaign._id);
+
+
+    // res.render('index', req.body);
   });
 
   // Campaign list
