@@ -21,14 +21,19 @@ mongoose.connect('mongodb://localhost/Emailads');
 // defaultUser.save(function (err) {
 //   if (err) console.log(err);
 // })
-
+var users = [
+    { id: 1, username: 'test', password: 'test', email: 'bob@example.com' }
+];
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    User.findOne({ username: username, password: password }, function(err, user) {
+    User.findOne({ username: username }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!user.validPassword(password)) {
+        return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, user);
     });
@@ -43,10 +48,12 @@ module.exports = function(app){
 
 
   app.post('/login',
-  passport.authenticate('local', { successRedirect: '/',
-                                     failureRedirect: '/',
-                                     failureFlash: true })
-  );
+    passport.authenticate('local', 
+    { 
+      successRedirect: '/',
+      failureRedirect: '/',
+      failureFlash: false })
+    );
 
 
   app.get('/deleteall', function(req,res,next){
@@ -200,6 +207,10 @@ module.exports = function(app){
         res.render('user', {user: user});
       }
     });
+  });
+
+  app.get('/login', function(req,res,next){
+    res.render('login', {});
   });
 
 // Helper functions

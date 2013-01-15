@@ -11,7 +11,10 @@
     "mongoose-auth": ">=0.0.12",
     "ejs": ">=0.8.3",
     "request": "*",
-    "config": "*"
+    "config": "*",
+    "passport": "0.1.15",
+    "passport-local": "0.1.6",
+    "connect-flash": "*"
   }
 }
 

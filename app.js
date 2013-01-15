@@ -9,7 +9,11 @@
  , path = require('path')
  , config = require('config')
  , RasterizerService = require('./lib/rasterizerService')
- , FileCleanerService = require('./lib/fileCleanerService');
+ , FileCleanerService = require('./lib/fileCleanerService')
+ , flash = require('connect-flash')
+ , passport = require('passport')
+
+
 
  process.on('uncaughtException', function (err) {
   console.error("[uncaughtException]", err);
@@ -40,6 +44,11 @@
   app.set('fileCleanerService', new FileCleanerService(config.cache.lifetime));
 
   app.use(express.static(path.join(__dirname, 'public')));
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(flash());
+
 });
 
  app.configure('development', function(){
