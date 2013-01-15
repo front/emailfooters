@@ -16,6 +16,13 @@ var Campaign = new Schema({
 	image: String
 });
 
+var User = new Schema({
+  username:  String,
+  password:  String,
+  imageurl: String,
+  campaigns: [Campaign]
+});
+
 // Campaign.plugin(mongooseAuth, {
 // 	facebook: true
 // });
@@ -37,4 +44,5 @@ var Campaign = new Schema({
 //   console.log('test model saved');
 // });
 
-module.exports = mongoose.model('Campaign', Campaign);
+module.exports.Campaign = mongoose.model('Campaign', Campaign);
+module.exports.User = mongoose.model('User', User);
