@@ -1,5 +1,5 @@
 var Campaign = require('../models/Campaign');
-var User = require('../models/Campaign');
+var User = require('../models/User');
 
 // Needed modules
 var mongoose = require('mongoose');
@@ -9,22 +9,44 @@ var utils = require('../lib/utils');
 var join = require('path').join;
 var request = require('request');
 var url = require('url');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 // Connect to DB
 mongoose.connect('mongodb://localhost/Emailads');
 
 
 // dev - Create a default user
-var defaultUser = new User({ username: 'defaultUser' });
-defaultUser.save(function (err) {
-  if (err) console.log(err);
-})
+// var defaultUser = new User({ username: 'defaultUser' });
+// defaultUser.save(function (err) {
+//   if (err) console.log(err);
+// })
+
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne({ username: username, password: password }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      return done(null, user);
+    });
+  }
+));
 
 
 module.exports = function(app){
 
   var rasterizerService = app.settings.rasterizerService;
   var fileCleanerService = app.settings.fileCleanerService;
+
+
+  app.post('/login',
+  passport.authenticate('local', { successRedirect: '/',
+                                     failureRedirect: '/',
+                                     failureFlash: true })
+  );
 
 
   app.get('/deleteall', function(req,res,next){
@@ -48,7 +70,7 @@ module.exports = function(app){
           }
         });
       });
-    } 
+    }
     campaign = new Campaign();
     campaign.title = req.body.title || '';
     campaign.body = req.body.body || '';
