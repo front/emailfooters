@@ -46,8 +46,8 @@ module.exports = function(app){
 
 
   app.post('/login',
-    passport.authenticate('local', 
-    { 
+    passport.authenticate('local',
+    {
       successRedirect: '/user',
       failureRedirect: '/',
       failureFlash: false })
@@ -63,7 +63,8 @@ module.exports = function(app){
   });
   app.get('/add', function(req,res, next){
     res.render('index', {});
-  });  app.post('/add', function (req,res, next){
+  });
+  app.post('/add', function (req,res, next){
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
       fs.readFile(req.files.image.path, function (err, data) {
@@ -200,7 +201,7 @@ module.exports = function(app){
       // {'_id': req.params.id}
       )
     .exec(function(err, user){
-      if(err) { 
+      if(err) {
         console.log( 'No User found with that id');
       } else {
         console.log('Found User!');
