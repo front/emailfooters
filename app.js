@@ -8,8 +8,6 @@
  , http = require('http')
  , path = require('path')
  , config = require('config')
- , RasterizerService = require('./lib/rasterizerService')
- , FileCleanerService = require('./lib/fileCleanerService')
  , flash = require('connect-flash')
  , passport = require('passport')
 
@@ -46,8 +44,7 @@
   app.use(flash());
 
   app.use(app.router);
-  app.set('rasterizerService', new RasterizerService(config.rasterizer).startService());
-  app.set('fileCleanerService', new FileCleanerService(config.cache.lifetime));
+
 
   app.use(express.static(path.join(__dirname, 'public')));
 

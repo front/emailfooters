@@ -38,8 +38,7 @@ passport.use(new LocalStrategy(
 
 module.exports = function(app){
 
-  var rasterizerService = app.settings.rasterizerService;
-  var fileCleanerService = app.settings.fileCleanerService;
+
 
 
   app.post('/login',
