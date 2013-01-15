@@ -36,7 +36,7 @@ passport.use(new LocalStrategy(
       return done(null, user);
     });
   }
-));
+  ));
 
 
 module.exports = function(app){
@@ -59,9 +59,11 @@ module.exports = function(app){
     res.redirect('/');
   });
   app.get('/', function(req,res, next){
-    res.render('index', {});
+    res.render('frontpage', {});
   });
-  app.post('/', function (req,res, next){
+  app.get('/add', function(req,res, next){
+    res.render('index', {});
+  });  app.post('/add', function (req,res, next){
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
       fs.readFile(req.files.image.path, function (err, data) {
@@ -210,10 +212,13 @@ module.exports = function(app){
   app.get('/login', function(req,res,next){
     res.render('login', {});
   });
+
   app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
+    req.logout();
+    res.redirect('/');
+  });
+
+
 
 
 // Helper functions
