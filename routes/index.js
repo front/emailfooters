@@ -15,7 +15,7 @@ mongoose.connect('mongodb://localhost/Emailads');
 
 
 // dev - Create a default user
-var defaultUser = new User({ username: 'defaultUser' });
+var defaultUser = new User({ username: 'defaultUser', imageurl: 'http://foo.com' });
 defaultUser.save(function (err) {
   if (err) console.log(err);
 })
@@ -126,7 +126,7 @@ module.exports = function(app){
     req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
   });
 
-  // Shows the actual screenshot
+  // Shows the actual screenshot file for a campaign
   app.get('/campaign/screenshot/:id?', function(req,res, next){
     var url = 'http://localhost:3000/campaign/render/' + req.params.id;
     // required options
@@ -164,7 +164,21 @@ module.exports = function(app){
     processImageUsingRasterizer(options, filePath, res, callbackUrl, function(err) { if(err) next(err); });
   });
 
-
+  // User page
+  app.get( '/user', function (req,res,next){
+    var query = User
+    .findOne(
+      // {'_id': req.params.id}
+      )
+    .exec(function(err, user){
+      if(err) { 
+        console.log( 'No User found with that id');
+      } else {
+        console.log('Found User!');
+        res.render('user', {user: user});
+      }
+    });
+  });
 
 // Helper functions
 var processImageUsingCache = function(filePath, res, url, callback) {
