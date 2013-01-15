@@ -1,6 +1,4 @@
-var Campaign = require('../models/Campaign');
-var User = require('../models/User');
-
+var Models = require('../models/Campaign');
 // Needed modules
 var mongoose = require('mongoose');
 var fs = require('fs');
@@ -15,9 +13,8 @@ var LocalStrategy = require('passport-local').Strategy;
 // Connect to DB
 mongoose.connect('mongodb://localhost/Emailads');
 
-
 // dev - Create a default user
-var defaultUser = new User({ username: 'test', password: 'test' });
+var defaultUser = new Models.User({ username: 'test', password: 'test' });
 defaultUser.save(function (err) {
   if (err) console.log(err);
 })
@@ -25,7 +22,7 @@ defaultUser.save(function (err) {
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
+    Models.User.findOne({ username: username }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
@@ -55,7 +52,7 @@ module.exports = function(app){
 
 
   app.get('/deleteall', function(req,res,next){
-    Campaign.collection.drop();
+    Models.Campaign.collection.drop();
     res.redirect('/');
   });
   app.get('/', function(req,res, next){
@@ -64,6 +61,7 @@ module.exports = function(app){
   app.get('/add', function(req,res, next){
     res.render('index', {});
   });
+
   app.post('/add', function (req,res, next){
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
@@ -79,7 +77,7 @@ module.exports = function(app){
         });
       });
     }
-    campaign = new Campaign();
+    campaign = new Models.Campaign();
     campaign.title = req.body.title || '';
     campaign.body = req.body.body || '';
     campaign.url = req.body.url || '';
@@ -102,7 +100,7 @@ module.exports = function(app){
 
   // Campaign list
   app.get('/campaigns', function(req,res,next){
-    Campaign
+    Models.Campaign
     .find()
     .exec( function(err,campaigns){
       if(err){
@@ -118,7 +116,7 @@ module.exports = function(app){
   app.get('/campaign/:id?', function (req,res,next){
     console.log(req.params.id);
 
-    var query = Campaign.findOne({'_id': req.params.id});
+    var query = Models.Campaign.findOne({'_id': req.params.id});
     query.exec(function(err,campaign){
       if(err) return 'No campaign found with that id';
       console.log('Found campaign!');
@@ -130,7 +128,7 @@ module.exports = function(app){
 
   // Rendered output for a single campaign that will be used for screenshot
   app.get('/campaign/render/:id', function(req,res,next){
-    Campaign
+    Models.Campaign
     .findOne({ '_id': req.params.id})
     .exec( function(err,campaign){
       if(err){
@@ -196,7 +194,7 @@ module.exports = function(app){
 
   // User page
   app.get( '/user', function (req,res,next){
-    var query = User
+    var query = Models.User
     .findOne(
       // {'_id': req.params.id}
       )

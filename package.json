@@ -14,7 +14,8 @@
     "config": "*",
     "passport": "0.1.15",
     "passport-local": "0.1.6",
-    "connect-flash": "*"
+    "connect-flash": "*",
+    "yaml": "*"
   }
 }
 
