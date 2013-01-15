@@ -11,9 +11,6 @@
  , RasterizerService = require('./lib/rasterizerService')
  , FileCleanerService = require('./lib/fileCleanerService');
 
-
-
-
  process.on('uncaughtException', function (err) {
   console.error("[uncaughtException]", err);
   process.exit(1);
