@@ -39,15 +39,19 @@
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+
+  // passport setup. These needs to be *before*   app.use(app.router);
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(flash());
+
   app.use(app.router);
   app.set('rasterizerService', new RasterizerService(config.rasterizer).startService());
   app.set('fileCleanerService', new FileCleanerService(config.cache.lifetime));
 
   app.use(express.static(path.join(__dirname, 'public')));
 
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(flash());
+
 
 });
 
@@ -55,6 +59,16 @@
   app.use(express.errorHandler());
 });
  require('./routes')(app);
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  findById(id, function (err, user) {
+    done(err, user);
+  });
+});
 
 
 

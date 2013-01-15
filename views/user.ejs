@@ -3,13 +3,9 @@
 
 <body>
 	<% include navigation %>
-	<% if (typeof imageurl !== 'undefined'){ %>
-	<h2>Imageurl</h2>
-	<% } else { %>
-	<h2>No user</h2>
-	<%} %>
+	<h2>Welcome <%= user.username %></h2>
 
-
+<p><a href="/logout" class="btn">Log out</a></p>
 
 </body>
 </html>

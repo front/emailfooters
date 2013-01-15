@@ -17,13 +17,11 @@ mongoose.connect('mongodb://localhost/Emailads');
 
 
 // dev - Create a default user
-// var defaultUser = new User({ username: 'defaultUser' });
-// defaultUser.save(function (err) {
-//   if (err) console.log(err);
-// })
-var users = [
-    { id: 1, username: 'test', password: 'test', email: 'bob@example.com' }
-];
+var defaultUser = new User({ username: 'test', password: 'test' });
+defaultUser.save(function (err) {
+  if (err) console.log(err);
+})
+
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
@@ -32,9 +30,9 @@ passport.use(new LocalStrategy(
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
       }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
+      // if (!user.validPassword(password)) {
+      //   return done(null, false, { message: 'Incorrect password.' });
+      // }
       return done(null, user);
     });
   }
@@ -50,7 +48,7 @@ module.exports = function(app){
   app.post('/login',
     passport.authenticate('local', 
     { 
-      successRedirect: '/',
+      successRedirect: '/user',
       failureRedirect: '/',
       failureFlash: false })
     );
@@ -212,6 +210,11 @@ module.exports = function(app){
   app.get('/login', function(req,res,next){
     res.render('login', {});
   });
+  app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
 
 // Helper functions
 var processImageUsingCache = function(filePath, res, url, callback) {
