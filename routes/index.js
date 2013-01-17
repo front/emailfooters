@@ -107,10 +107,7 @@ module.exports = function(app){
     if(err){
       console("Couldn't find a user to save the campaign to");
     } else {
-      console.log('Trying to push');
-      console.log(user);
       user.campaigns.push(campaign);
-      console.log(user);
       user.save(function (err) {
         if (err){ 
           console.log('Save failed...');
@@ -147,13 +144,11 @@ res.redirect('/campaign/' + campaign._id);
 
   // Show One specific campaign
   app.get('/campaign/:id?', function (req,res,next){
-    console.log(req.params.id);
 
     var query = Models.CampaignSchema.findOne({'_id': req.params.id});
     query.exec(function(err,campaign){
       if(err) return 'No campaign found with that id';
       console.log('Found campaign!');
-      //console.log(campaign);
       res.render('index', campaign);
 
     });
@@ -200,9 +195,6 @@ res.redirect('/campaign/' + campaign._id);
       if (req.param(name, false)) options.headers[name] = req.param(name);
       options.headers['width'] = '1';
       options.headers['height'] = '1';
-
-      console.log( 'paramaters:' );
-      console.log( req );
     });
 
     var filename = 'screenshot_' + utils.md5(url + JSON.stringify(options)) + '.png';
@@ -262,9 +254,6 @@ app.get('/logout', function(req, res){
 var processImageUsingCache = function(filePath, res, url, callback) {
   if (url) {
       // asynchronous
-      //res.send('Will post screenshot to ' + url + ' when processed');
-      console.log(url);
-
       postImageToUrl(filePath, url, callback);
     } else {
       // synchronous
@@ -328,7 +317,6 @@ var processImageUsingCache = function(filePath, res, url, callback) {
 }
 
 function findById(id, fn) {
-  console.log('findById');
   Models.UserSchema.findOne({_id: id}, function(err, user){
     if(err){ 
       fn(new Error('User ' + id + ' does not exist'));
@@ -339,7 +327,6 @@ function findById(id, fn) {
 }
 
 function findByUsername(username, fn) {
-  console.log('findByUsername');
   Models.UserSchema.findOne({username: username}, function(err, user){
     if(err){ 
       return fn(null, null);
@@ -350,7 +337,6 @@ function findByUsername(username, fn) {
 }
 
 passport.serializeUser(function(user, done) {
-  console.log('serializeUser')
   done(null, user.id);
 });
 
@@ -364,7 +350,6 @@ passport.deserializeUser(function(id, done) {
 
 
 function ensureAuthenticated(req, res, next) {
-  console.log('ensureAuthenticated');
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login')
 }
