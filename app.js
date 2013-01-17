@@ -37,8 +37,11 @@
   app.set('view engine', 'ejs');
   app.use(express.favicon());
   app.use(express.logger('dev'));
+  app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+
+  app.use(express.session({ secret: 'keyboard cat' }));
 
   // passport setup. These needs to be *before*   app.use(app.router);
   app.use(passport.initialize());
@@ -59,18 +62,6 @@
   app.use(express.errorHandler());
 });
  require('./routes')(app);
-
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-  findById(id, function (err, user) {
-    done(err, user);
-  });
-});
-
-
 
  http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

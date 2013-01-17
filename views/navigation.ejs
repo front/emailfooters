@@ -6,10 +6,9 @@
 			<li><a href="/campaigns">Campaigns</a></li>
 			<li><a href="/deleteall">Delete all</a></li>
 			<% if (typeof user !== 'undefined') { %>
-			<li><a href="/user">User</a></li>
+			<li><a href="/user">Hello, <%= user.username %></a></li>
 			<% } else { %>
 			<li><a href="/login">login</a></li>
-
 			<% } %>
 
 		</ul>
