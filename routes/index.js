@@ -15,7 +15,7 @@ var util = require('util');
 mongoose.connect('mongodb://localhost/Emailads');
 
 // dev - Create a default user
-var defaultUser = new Models.User({ username: 'test', password: 'test' });
+var defaultUser = new Models.UserSchema({ username: 'test', password: 'test' });
 defaultUser.save(function (err) {
   if (err) console.log(err);
 })
@@ -57,7 +57,7 @@ module.exports = function(app){
 
 
   app.get('/deleteall', function(req,res,next){
-    Models.Campaign.collection.drop();
+    Models.CampaignSchema.collection.drop();
     res.redirect('/');
   });
   app.get('/', function(req,res, next){
@@ -71,6 +71,12 @@ module.exports = function(app){
   });
 
   app.post('/add', function (req,res, next){
+    if(!req.user){
+      res.end('not logged in!');
+      return;
+    }
+
+    // Save attached image
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
       fs.readFile(req.files.image.path, function (err, data) {
@@ -85,7 +91,9 @@ module.exports = function(app){
         });
       });
     }
-    campaign = new Models.Campaign();
+
+    // Build object that will be saved
+    campaign = new Models.CampaignSchema();
     campaign.title = req.body.title || '';
     campaign.body = req.body.body || '';
     campaign.url = req.body.url || '';
@@ -94,21 +102,38 @@ module.exports = function(app){
     campaign.addlogo = req.body.addlogo || '';
     campaign.image = req.body.image || '';
 
+  // Find user to save to
+  Models.UserSchema.findOne({ _id: req.user._id},function(err, user){
+    if(err){
+      console("Couldn't find a user to save the campaign to");
+    } else {
+      console.log('Trying to push');
+      console.log(user);
+      user.campaigns.push(campaign);
+      console.log(user);
+      user.save(function (err) {
+        if (err){ 
+          console.log('Save failed...');
+        }
+        console.log('Campaign saved to user');
+      });
+    }
+  });
 
-    campaign.save(function(err){
-      if(err){
-        console.log(err);
-      } else {
-        console.log('Saved Campaign');
-      }
-    });
-    res.redirect('/campaign/' + campaign._id);
+  // campaign.save(function(err){
+  //   if(err){
+  //     console.log(err);
+  //   } else {
+  //     console.log('Saved Campaign');
+  //   }
+  // });
+res.redirect('/campaign/' + campaign._id);
     // res.render('index', req.body);
   });
 
   // Campaign list
   app.get('/campaigns', function(req,res,next){
-    Models.Campaign
+    Models.CampaignSchema
     .find()
     .exec( function(err,campaigns){
       if(err){
@@ -124,7 +149,7 @@ module.exports = function(app){
   app.get('/campaign/:id?', function (req,res,next){
     console.log(req.params.id);
 
-    var query = Models.Campaign.findOne({'_id': req.params.id});
+    var query = Models.CampaignSchema.findOne({'_id': req.params.id});
     query.exec(function(err,campaign){
       if(err) return 'No campaign found with that id';
       console.log('Found campaign!');
@@ -136,7 +161,7 @@ module.exports = function(app){
 
   // Rendered output for a single campaign that will be used for screenshot
   app.get('/campaign/render/:id', function(req,res,next){
-    Models.Campaign
+    Models.CampaignSchema
     .findOne({ '_id': req.params.id})
     .exec( function(err,campaign){
       if(err){
@@ -202,7 +227,7 @@ module.exports = function(app){
   // User page
   // app.get( '/user', function (req,res,next){
 
-  //   var query = Models.User
+  //   var query = Models.UserSchema
   //   .findOne(
   //     // {'_id': req.params.id}
   //     )
@@ -304,7 +329,7 @@ var processImageUsingCache = function(filePath, res, url, callback) {
 
 function findById(id, fn) {
   console.log('findById');
-  Models.User.findOne({_id: id}, function(err, user){
+  Models.UserSchema.findOne({_id: id}, function(err, user){
     if(err){ 
       fn(new Error('User ' + id + ' does not exist'));
     } else {
@@ -315,7 +340,7 @@ function findById(id, fn) {
 
 function findByUsername(username, fn) {
   console.log('findByUsername');
-  Models.User.findOne({username: username}, function(err, user){
+  Models.UserSchema.findOne({username: username}, function(err, user){
     if(err){ 
       return fn(null, null);
     } else {

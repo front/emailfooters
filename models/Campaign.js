@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 
 
 
-var Campaign = new Schema({ 
+var CampaignSchema = new Schema({ 
 	title: String,
 	body: String, 
 	url: String, 
@@ -16,11 +16,11 @@ var Campaign = new Schema({
 	image: String
 });
 
-var User = new Schema({
+var UserSchema = new Schema({
   username:  String,
   password:  String,
   imageurl: String,
-  campaigns: [Campaign]
+  campaigns: [CampaignSchema]
 });
 
 // Campaign.plugin(mongooseAuth, {
@@ -44,5 +44,5 @@ var User = new Schema({
 //   console.log('test model saved');
 // });
 
-module.exports.Campaign = mongoose.model('Campaign', Campaign);
-module.exports.User = mongoose.model('User', User);
+module.exports.CampaignSchema = mongoose.model('CampaignSchema', CampaignSchema);
+module.exports.UserSchema = mongoose.model('UserSchema', UserSchema);
