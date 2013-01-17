@@ -12,7 +12,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var util = require('util');
 
 // Connect to DB
-mongoose.connect('mongodb://localhost/Emailads');
+mongoose.connect('mongodb://localhost/Emailads2');
 
 // dev - Create a default user
 var defaultUser = new Models.UserSchema({ username: 'test', password: 'test' });
@@ -103,53 +103,66 @@ module.exports = function(app){
     campaign.image = req.body.image || '';
 
   // Find user to save to
-  Models.UserSchema.findOne({ _id: req.user._id},function(err, user){
+  // console.log(req.user);
+  campaign.userID = req.user._id;
+
+  console.log(campaign);
+
+  campaign.save(function(err){
     if(err){
-      console("Couldn't find a user to save the campaign to");
+      console.log(err);
     } else {
-      user.campaigns.push(campaign);
-      user.save(function (err) {
-        if (err){ 
-          console.log('Save failed...');
-        }
-        console.log('Campaign saved to user');
-      });
+      console.log('Saved Campaign');
     }
   });
-
-  // campaign.save(function(err){
-  //   if(err){
-  //     console.log(err);
-  //   } else {
-  //     console.log('Saved Campaign');
-  //   }
-  // });
-res.redirect('/campaign/' + campaign._id);
+  res.redirect('/campaign/' + campaign._id);
     // res.render('index', req.body);
   });
 
   // Campaign list
   app.get('/campaigns', function(req,res,next){
+    if( typeof req.user == 'undefined'){
+      res.redirect('/login');
+      return;
+    }
+
     Models.CampaignSchema
-    .find()
+    .find({ userID: req.user._id})
     .exec( function(err,campaigns){
       if(err){
         console.log(err);
       } else {
-        res.render('campaigns',{user: req.user, campaigns: campaigns});
+        if (campaigns.length > 0) {
+          console.log('Found campaigns!!'); 
+          console.log( campaigns);
+        } else {
+          console.log('no campaigns found');
+        }
+        res.render('campaigns',{ user: req.user, campaigns: campaigns });
       }
     }
     );
   });
 
   // Show One specific campaign
-  app.get('/campaign/:id?', function (req,res,next){
-
+  app.get('/campaign/:id', function (req,res,next){
+    if( typeof req.user === 'undefined'){
+      res.redirect('/login');
+      return;
+    }
+    console.log('foo');
     var query = Models.CampaignSchema.findOne({'_id': req.params.id});
-    query.exec(function(err,campaign){
+    query.exec(function(err, campaign){
+      console.log('bar');
+
       if(err) return 'No campaign found with that id';
       console.log('Found campaign!');
-      res.render('index', campaign);
+      console.log(campaign);
+      console.log(req.user);
+
+      var params = campaign;
+      params.user = req.user;
+      res.render('index',  params );
 
     });
   });
@@ -171,9 +184,7 @@ res.redirect('/campaign/' + campaign._id);
   // Catches the screenshot callback
   app.post('/screenshotCallback', function(req,res,next){
     req.on('end', function(){
-      //console.log(req);
       res.send('foobar');
-      //res.writeHead(200);
 
       res.end();
     });
@@ -341,7 +352,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log('DeserializeUser')
+  // console.log('DeserializeUser')
 
   findById(id, function (err, user) {
     done(err, user);
