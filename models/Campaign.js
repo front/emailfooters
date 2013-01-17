@@ -13,14 +13,14 @@ var CampaignSchema = new Schema({
 	addlogo: Boolean, 
 	schedule: String, 
 	internal_title: String, 
-	image: String
+	image: String,
+	userID: Schema.ObjectId
 });
 
 var UserSchema = new Schema({
   username:  String,
   password:  String,
-  imageurl: String,
-  campaigns: [CampaignSchema]
+  imageurl: String
 });
 
 // Campaign.plugin(mongooseAuth, {
