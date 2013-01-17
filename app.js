@@ -48,7 +48,7 @@
   app.use(passport.session());
   app.use(flash());
 
-  app.use(app.router);
+  app.use('/', app.router);
   app.set('rasterizerService', new RasterizerService(config.rasterizer).startService());
   app.set('fileCleanerService', new FileCleanerService(config.cache.lifetime));
 
