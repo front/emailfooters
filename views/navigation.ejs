@@ -21,7 +21,7 @@
 						<li><a href="/campaigns">Campaigns</a></li>
 						<li><a href="/deleteall">Delete all</a></li>
 						<% if (typeof user !== 'undefined') { %>
-						<li><a href="/user">Hello, <%= user.username %></a></li>
+						<li><a class="btn-header"  href="/user">Hello, <%= user.username %></a></li>
 						<% } else { %>
 						<li><a class="btn-header" href="/login">login</a></li>
 						<% } %>
