@@ -19,25 +19,7 @@ var defaultUser = new Models.User({ username: 'test', password: 'test' });
 defaultUser.save(function (err) {
   if (err) console.log(err);
 })
-var users = [
-{ id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
-, { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
-];
 
-// passport.use(new LocalStrategy(
-//   function(username, password, done) {
-//     Models.User.findOne({ username: username }, function(err, user) {
-//       if (err) { return done(err); }
-//       if (!user) {
-//         return done(null, false, { message: 'Incorrect username.' });
-//       }
-//       // if (!user.validPassword(password)) {
-//       //   return done(null, false, { message: 'Incorrect password.' });
-//       // }
-//       return done(null, user);
-//     });
-//   }
-//   ));
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
@@ -69,7 +51,7 @@ module.exports = function(app){
     passport.authenticate('local',
     {
       successRedirect: '/user',
-      failureRedirect: '/',
+      failureRedirect: '/loginfail',
       failureFlash: false })
     );
 
@@ -83,6 +65,9 @@ module.exports = function(app){
   });
   app.get('/add', function(req,res, next){
     res.render('index', {user:req.user});
+  });
+  app.get('/loginfail', function(req,res, next){
+    res.end('login fail');
   });
 
   app.post('/add', function (req,res, next){
@@ -236,14 +221,14 @@ app.get('/user', ensureAuthenticated, function(req, res){
   res.render('user', { user: req.user });
 });
 
-  app.get('/login', function(req,res,next){
-    res.render('login', {});
-  });
+app.get('/login', function(req,res,next){
+  res.render('login', {});
+});
 
-  app.get('/logout', function(req, res){
-    req.logout();
-    res.redirect('/');
-  });
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 
 
@@ -318,22 +303,25 @@ var processImageUsingCache = function(filePath, res, url, callback) {
 }
 
 function findById(id, fn) {
-  var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
-  } else {
-    fn(new Error('User ' + id + ' does not exist'));
-  }
+  console.log('findById');
+  Models.User.findOne({_id: id}, function(err, user){
+    if(err){ 
+      fn(new Error('User ' + id + ' does not exist'));
+    } else {
+      fn(null, user);
+    }
+  });
 }
 
 function findByUsername(username, fn) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    if (user.username === username) {
-      return fn(null, user);
+  console.log('findByUsername');
+  Models.User.findOne({username: username}, function(err, user){
+    if(err){ 
+      return fn(null, null);
+    } else {
+      fn(null, user);
     }
-  }
-  return fn(null, null);
+  });
 }
 
 passport.serializeUser(function(user, done) {
@@ -351,6 +339,7 @@ passport.deserializeUser(function(id, done) {
 
 
 function ensureAuthenticated(req, res, next) {
+  console.log('ensureAuthenticated');
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login')
 }
