@@ -56,25 +56,22 @@ module.exports = function(app){
     );
 
 
-  app.get('/deleteall', function(req,res,next){
+  app.get('/deleteall', ensureAuthenticated, function(req,res,next){
     Models.CampaignSchema.collection.drop();
     res.redirect('/');
   });
   app.get('/', function(req,res, next){
     res.render('frontpage', {user: req.user});
   });
-  app.get('/add', function(req,res, next){
+  app.get('/add', ensureAuthenticated, function(req,res, next){
     res.render('index', {user:req.user});
   });
   app.get('/loginfail', function(req,res, next){
     res.end('login fail');
   });
 
-  app.post('/add', function (req,res, next){
-    if(!req.user){
-      res.end('not logged in!');
-      return;
-    }
+  app.post('/add', ensureAuthenticated, function (req,res, next){
+
 
     // Save attached image
     if ( typeof req.files.image !== 'undefined'){
@@ -120,11 +117,8 @@ module.exports = function(app){
   });
 
   // Campaign list
-  app.get('/campaigns', function(req,res,next){
-    if( typeof req.user == 'undefined'){
-      res.redirect('/login');
-      return;
-    }
+  app.get('/campaigns', ensureAuthenticated, function(req,res,next){
+
 
     Models.CampaignSchema
     .find({ userID: req.user._id})
@@ -145,11 +139,8 @@ module.exports = function(app){
   });
 
   // Show One specific campaign
-  app.get('/campaign/:id', function (req,res,next){
-    if( typeof req.user === 'undefined'){
-      res.redirect('/login');
-      return;
-    }
+  app.get('/campaign/:id', ensureAuthenticated, function (req,res,next){
+
     console.log('foo');
     var query = Models.CampaignSchema.findOne({'_id': req.params.id});
     query.exec(function(err, campaign){
@@ -168,7 +159,7 @@ module.exports = function(app){
   });
 
   // Rendered output for a single campaign that will be used for screenshot
-  app.get('/campaign/render/:id', function(req,res,next){
+  app.get('/campaign/render/:id', ensureAuthenticated, function(req,res,next){
     Models.CampaignSchema
     .findOne({ '_id': req.params.id})
     .exec( function(err,campaign){
@@ -182,7 +173,7 @@ module.exports = function(app){
   });
 
   // Catches the screenshot callback
-  app.post('/screenshotCallback', function(req,res,next){
+  app.post('/screenshotCallback', ensureAuthenticated, function(req,res,next){
     req.on('end', function(){
       res.send('foobar');
 
@@ -194,7 +185,7 @@ module.exports = function(app){
   });
 
   // Shows the actual screenshot file for a campaign
-  app.get('/campaign/screenshot/:id?', function(req,res, next){
+  app.get('/campaign/screenshot/:id?', ensureAuthenticated, function(req,res, next){
     var url = 'http://localhost:3000/campaign/render/' + req.params.id;
     // required options
     var options = {
