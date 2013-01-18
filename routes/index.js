@@ -197,23 +197,22 @@ module.exports = function(app){
 
     // console.log(rasterizerService.getPort());
     ['width', 'height', 'clipRect', 'javascriptEnabled', 'loadImages', 'localToRemoteUrlAccessEnabled', 'userAgent', 'userName', 'password', 'delay'].forEach(function(name) {
-    });
       if (req.param(name, false)) options.headers[name] = req.param(name);
       options.headers['width'] = '1';
       options.headers['height'] = '1';
-
     });
+
     var filename = 'screenshot_' + utils.md5(url + JSON.stringify(options)) + '.png';
     options.headers.filename = filename;
 
-
     var filePath = join(rasterizerService.getPath(), filename);
+
     var callbackUrl = req.param('callback', false) ? utils.url(req.param('callback')) : false;
     //callbackUrl='http://localhost:3000/screenshotCallback';
     console.log('callbackURL is now=' + callbackUrl);
 
-    if (path.existsSync(filePath)) {
 
+    if (path.existsSync(filePath)) {
       console.log('Request for %s - Found in cache', url);
       processImageUsingCache(filePath, res, callbackUrl, function(err) { if (err) next(err); });
       return;
