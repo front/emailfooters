@@ -1,15 +1,17 @@
 var Models = require('../models/Campaign');
 // Needed modules
-var mongoose = require('mongoose');
-var fs = require('fs');
-var path = require('path');
-var utils = require('../lib/utils');
-var join = require('path').join;
-var request = require('request');
-var url = require('url');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var util = require('util');
+var mongoose = require('mongoose')
+, fs = require('fs')
+, path = require('path')
+, utils = require('../lib/utils')
+, join = require('path').join
+, request = require('request')
+, url = require('url')
+, passport = require('passport')
+, LocalStrategy = require('passport-local').Strategy
+, util = require('util')
+, flash = require('connect-flash');
+
 
 // Connect to DB
 mongoose.connect('mongodb://localhost/Emailads2');
@@ -192,24 +194,26 @@ module.exports = function(app){
       uri: 'http://localhost:' + rasterizerService.getPort() + '/',
       headers: { url: url }
     };
+
     // console.log(rasterizerService.getPort());
     ['width', 'height', 'clipRect', 'javascriptEnabled', 'loadImages', 'localToRemoteUrlAccessEnabled', 'userAgent', 'userName', 'password', 'delay'].forEach(function(name) {
+    });
       if (req.param(name, false)) options.headers[name] = req.param(name);
       options.headers['width'] = '1';
       options.headers['height'] = '1';
-    });
 
+    });
     var filename = 'screenshot_' + utils.md5(url + JSON.stringify(options)) + '.png';
     options.headers.filename = filename;
 
-    var filePath = join(rasterizerService.getPath(), filename);
 
+    var filePath = join(rasterizerService.getPath(), filename);
     var callbackUrl = req.param('callback', false) ? utils.url(req.param('callback')) : false;
     //callbackUrl='http://localhost:3000/screenshotCallback';
     console.log('callbackURL is now=' + callbackUrl);
 
-
     if (path.existsSync(filePath)) {
+
       console.log('Request for %s - Found in cache', url);
       processImageUsingCache(filePath, res, callbackUrl, function(err) { if (err) next(err); });
       return;
@@ -217,23 +221,6 @@ module.exports = function(app){
     console.log('Request for %s - Rasterizing it', url);
     processImageUsingRasterizer(options, filePath, res, callbackUrl, function(err) { if(err) next(err); });
   });
-
-  // User page
-  // app.get( '/user', function (req,res,next){
-
-  //   var query = Models.UserSchema
-  //   .findOne(
-  //     // {'_id': req.params.id}
-  //     )
-  //   .exec(function(err, user){
-  //     if(err) {
-  //       console.log( 'No User found with that id');
-  //     } else {
-  //       console.log('Found User!');
-  //       res.render('user', {user: user});
-  //     }
-  //   });
-  // });
 
 
 app.get('/user', ensureAuthenticated, function(req, res){
