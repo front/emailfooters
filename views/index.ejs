@@ -26,7 +26,7 @@
 		<% var title_value = typeof title !== 'undefined'
 		? "value='" + title + "'"
 		: ''; %>
-		<% var body_value = typeof body !== 'undefined' ?  body : ''; %>
+		<% var body_value = typeof body !== 'undefined' ?  body : 'foo'; %>
 
 		<form id="form" class="navbar-form pull-left" action="/add" method="post" enctype="multipart/form-data">
 			<input
@@ -38,11 +38,11 @@
 			value="<%= title %>"
 			<% } %>
 			><br/>
-			<textarea
-			name='body'
-			rows='3'
-			class='body'
-			placeholder='Body'><% if(typeof body !== 'undefined') { %><%= body %><% } %></textarea><br/>
+
+      <textarea id="CKeditor" name="CKeditor"><%= body_value %></textarea>
+<script type="text/javascript">
+  CKEDITOR.replace( 'CKeditor' );
+</script>
 <!-- 			<input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/>
 			<label class="checkbox">
 				<input name="addlogo" type="checkbox"> Use logo

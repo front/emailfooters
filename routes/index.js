@@ -74,7 +74,6 @@ module.exports = function(app){
 
   app.post('/add', ensureAuthenticated, function (req,res, next){
 
-
     // Save attached image
     if ( typeof req.files.image !== 'undefined'){
       console.log('Will try to save image');
@@ -90,11 +89,10 @@ module.exports = function(app){
         });
       });
     }
-
     // Build object that will be saved
     campaign = new Models.CampaignSchema();
     campaign.title = req.body.title || '';
-    campaign.body = req.body.body || '';
+    campaign.body = req.body.CKeditor || '';
     campaign.url = req.body.url || '';
     campaign.schedule = req.body.schedule || '';
     campaign.internal_title = req.body.internal_title || '';
