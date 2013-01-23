@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<% include header %>
+
+<body>
+  <% include navigation %>
+
+  <form id="register" class="navbar-form pull-left form-horizontal" action="/register" method="post">
+      <div class="control-group">
+        <label class="control-label" for="name">Name</label>
+        <div class="controls">
+            <input name='name' id="name" type="text" placeholder='Name' />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="password">Password</label>
+        <div class="controls">
+            <input name='password' id="password" type="password" placeholder='Password' />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="confirm">Confirm</label>
+        <div class="controls">
+            <input name='confirm' id="confirm" type="password" placeholder='Confirm' />
+        </div>
+    </div>
+
+    <button type="submit" class="btn">Register</button>
+</form>
+
+<!-- <% include footer %> -->
+</body>
+</html>

@@ -233,6 +233,21 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
+app.get('/register', function(req,res){
+  res.render('register');
+});
+
+app.post('/register', function(req, res){
+  
+  var defaultUser = new Models.UserSchema({ 
+    username: req.body.name, 
+    password: req.body.password });
+
+  defaultUser.save(function (err) {
+    if (err) console.log(err);
+  });
+  res.render('index', {});
+});
 
 
 
