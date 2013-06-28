@@ -4,24 +4,32 @@
 
 <body>
   <% include navigation %>
-
   <form id="register" class="navbar-form pull-left form-horizontal" action="/signup" method="post">
       <div class="control-group">
         <label class="control-label" for="name">Name</label>
         <div class="controls">
             <input name='name' id="name" type="text" placeholder='Name' />
+            <% if (message && message[0] && message[0].name_message) { %>
+                <span class="message"><%= message[0].name_message %></span>
+            <% } %>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="password">Password</label>
         <div class="controls">
             <input name='password' id="password" type="password" placeholder='Password' />
+           <% if (message && message[0] && message[0].pass_message) { %>
+                <span class="message"><%= message[0].pass_message %></span>
+            <% } %>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="confirm">Confirm</label>
         <div class="controls">
             <input name='confirm' id="confirm" type="password" placeholder='Confirm' />
+            <% if (message && message[0] && message[0].confirm_message) { %>
+                <span class="message"><%= message[0].confirm_message %></span>
+            <% } %>
         </div>
     </div>
     <div class="control-group">

@@ -1,0 +1,23 @@
+<html>
+<% include header %>
+<body>
+  <style>
+  body {
+    padding: 0;
+  }
+  #preview {
+    margin-left: 0;
+  }
+  </style>
+	<!-- <% include navigation %> -->
+	<div id="preview" class="span6">
+             <ul>
+                <% filelist.forEach(function(data){ %>
+                    <li>
+                   <input type="text" onClick="this.select();" value="<%=data.path%>" />
+                  </li>
+                <% }) %>
+              </ul>
+	</div>
+</body>
+</html>

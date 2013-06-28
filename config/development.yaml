@@ -1,0 +1,2 @@
+rasterizer:
+  imgURL: '/screenshots/'  # dir where the screenshot files are stored in user dir

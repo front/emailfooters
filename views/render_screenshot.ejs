@@ -1,0 +1,22 @@
+<html>
+<% include header %>
+<body>
+  <style>
+  body {
+    padding: 0;
+  }
+  #preview {
+    margin-left: 0;
+  }
+  </style>
+	<div id="screenshot" class="span6">
+            <a class="url" data-bind="attr:{href:url}"></a>
+            <h1 class="title" data-bind="text: title"><%= campaign.title %></h1>
+            <div id="body" data-bind="text: body"></div>
+            <textarea id="hiddentextarea" class="hidden"><%= campaign.body %></textarea>
+            <script>
+                $('#body').html($('#hiddentextarea').val());
+            </script>
+	</div>
+</body>
+</html>

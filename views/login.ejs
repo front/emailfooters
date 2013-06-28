@@ -6,23 +6,31 @@
   <form action="/login" method="post" class='navbar-form pull-left form-horizontal'>
     <div class="control-group">
       <label class="control-label" for="name">username</label>
+      
       <div class="controls">
         <input type="text" name="username"/>
+        <% if (message && message[0] && message[0].username_message) { %>
+                <span class="message"><%= message[0].username_message %></span>
+        <% } %>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="name">password</label>   
       <div class="controls">
         <input type="password" name="password"/>
+        <% if (message && message[0] && message[0].pass_message) { %>
+                <span class="message"><%= message[0].pass_message %></span>
+        <% } %>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
         <button type="submit" class="btn">Log in</button><a href="/signup">...or Sign up</a>
       </div>
-    </form>
+    </div>
   </form>
+  <% include footer %>
 </body>
-<% include footer %>
+
 
 </html>

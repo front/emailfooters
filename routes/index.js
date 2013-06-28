@@ -1,203 +1,457 @@
 var Models = require('../models/Campaign');
 // Needed modules
 var mongoose = require('mongoose')
-, fs = require('fs')
-, path = require('path')
-, utils = require('../lib/utils')
-, join = require('path').join
-, request = require('request')
-, url = require('url')
-, passport = require('passport')
-, util = require('util')
-, flash = require('connect-flash')
-, helperFunctions = require('./helperFunctions');
-
+        , fs = require('fs')
+        , path = require('path')
+        , utils = require('../lib/utils')
+        , join = require('path').join
+        , request = require('request')
+        , url = require('url')
+        , passport = require('passport')
+        , util = require('util')
+        , flash = require('connect-flash')
+        , helperFunctions = require('./helperFunctions');
 
 // Connect to DB
-mongoose.connect('mongodb://localhost/Emailads2');
+//var mongoconn = mongoose.connect('mongodb://' + domain + '/Emailads2');
+var mongoconn = mongoose.connect('mongodb://root:root@' + domain);
 
-module.exports = function(app){
+String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, '');
+};
 
-  var rasterizerService = app.settings.rasterizerService;
-  var fileCleanerService = app.settings.fileCleanerService;
+//var options = {
+//auth: '("root":"root")'
+//}
+//mongoose.connect('mongodb://' + domain + '/Emailads2', options);
+var fileCleanerService, rasterizerService;
 
-  app.post('/login',
-    passport.authenticate('local',
-    {
-      successRedirect: '/user',
-      failureRedirect: '/loginfail',
-      failureFlash: false })
-    );
+module.exports.fileCleanerService = function() {
+    return fileCleanerService;
+};
+module.exports.rasterizerService = function() {
+    return rasterizerService;
+};
+module.exports = function(app) {
+    rasterizerService = app.settings.rasterizerService;
+    fileCleanerService = app.settings.fileCleanerService;
+    app.post('/login', passport.authenticate('local', {
+        failureRedirect: '/loginfail',
+        failureFlash: false}), function(req, res, next) {
+        res.redirect('/user');
+    });
+    app.get('/loginfail', function(req, res, next) {
+        var flag;
+        req.message = {};
+        req.message.username_message = "Username and/or password incorrect.";
+        req.type = 'username_message';
+        req.url = '/login';
+        helperFunctions.showMessage(req, res, next);
+    });
+    app.get('/deleteall', ensureAuthenticated, function(req, res, next) {
+        // Models.CampaignSchema.collection.drop();
+        var dirPath = path.join(__dirname, "../imgurl/", req.user._id + "", "/");
+        var rmDir = function(dirPath) {
+            try {
+                var files = fs.readdirSync(dirPath);
+            }
+            catch (e) {
+                return;
+            }
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    var filePath = path.join(dirPath, '/', files[i]);
+                    console.log(fs.statSync(filePath).isFile())
+                    if (fs.statSync(filePath).isFile())
+                        fs.unlinkSync(filePath);
+                    //  else
+                    //      rmDir(filePath);
+                }
+                console.log('Removing all screenshots')
+            }
+            //fs.rmdirSync(dirPath);
+        };
+        Models.CampaignSchema
+                .find({userID: req.user._id})
+                .remove(function(err, campaigns) {
+            if (err) {
+                req.message = JSON.stringify(err);
+                helperFunctions.showMessage(req, res, next)
+                console.log(err);
+            } else {
+                rmDir(dirPath);
+                res.redirect('/campaigns');
+            }
+        })
+    });
+    app.get('/campaign/delete/:id', ensureAuthenticated, function(req, res, next) {
+        Models.CampaignSchema
+                .find({userID: req.user._id, _id: req.params.id})
+                .remove(function(err, campaigns) {
+            if (err) {
+                req.message = JSON.stringify(err);
+                helperFunctions.showMessage(req, res, next)
+                console.log(err);
+            } else {
+                console.log('Delete screenshot');
+                var imagePath = path.join(__dirname, "../imgurl/", req.user._id + "", "/", "screenshot_" + req.params.id);
+                fs.unlink(imagePath, function(err) {
+                    if (err) {
+                        if (req) {
+                            req.message = JSON.stringify(err);
+                            showMessage(req, res, next);
+                        }
+                        console.log(err);
+                    }
+                    res.redirect('/campaigns');
+                });
+            }
+        })
+    });
+    app.get('/errorpage', function(req, res, next) {
+        res.render('errorpage', {pagetitle: 'Error', message: req.flash('info')});
+        // res.redirect('errorpage', {pagetitle: 'Error', data: req});
+    });
+    app.get('/flash/:id', function(req, res, next) {
 
-  app.get('/deleteall', ensureAuthenticated, function(req,res,next){
-    Models.CampaignSchema.collection.drop();
-    res.redirect('/');
-  });
-  app.get('/', function(req,res, next){
-    res.render('frontpage', {user: req.user});
-  });
-  app.get('/add', ensureAuthenticated, function(req,res, next){
-    res.render('index', {user:req.user});
-  });
-  app.get('/loginfail', function(req,res, next){
-    res.end('login fail');
-  });
 
-  app.post('/add', ensureAuthenticated, function (req,res,next){
-    helperFunctions.addNewCampaign(req,res,next);
-   
-  });
+        //  req.message = "Hi! T'his is a test page!";
+        //   helperFunctions.showMessage(req, res, next)
+        //req.flash('info', 'Welcome');
+        // res.redirect('/errorpage');
 
-  // Campaign list
-  app.get('/campaigns', ensureAuthenticated, function(req,res,next){
+        //  res.redirect('/campaigns');
+    });
+    app.get('/', function(req, res, next) {
+        res.render('frontpage', {pagetitle: 'Welcome to Emailfooters', user: req.user});
+    });
+    app.get('/add', ensureAuthenticated, function(req, res, next) {
+        console.log(req.user)
+        console.log(JSON.stringify(req.isAuthenticated))
+        var params = {};
+        var dirPath = path.join(__dirname, "../uploads/", req.user._id + "", "/")
+        params.user = req.user;
+        params.pagetitle = 'Add';
+        params.uploadedList = helperFunctions.getUploadedFiles(req, res, next, params, dirPath);
+        //  res.render('index', {pagetitle: 'Add', user: req.user});
+    });
 
+    app.post('/add', ensureAuthenticated, function(req, res, next) {
+        helperFunctions.addNewCampaign(req, res, next);
+    });
+    app.post('/adddata/:id?', ensureAuthenticated, function(req, res, next) {
+        helperFunctions.uploadImage(req, res, next);
+    });
+    // Campaign list
+    app.get('/campaigns', ensureAuthenticated, function(req, res, next) {
+        Models.CampaignSchema
+                .find({userID: req.user._id}).sort("last_updated -1")
+                .exec(function(err, campaigns) {
+            if (err) {
+                req.message = JSON.stringify(err);
+                helperFunctions.showMessage(req, res, next)
+                console.log(err);
+            } else {
+                if (campaigns.length > 0) {
+                    console.log('Found campaigns!!');
+                    //   console.log(campaigns);
+                } else {
+                    console.log('no campaigns found');
+                }
+                res.render('campaigns', {pagetitle: 'Your list of campaigns', user: req.user, campaigns: campaigns});
+            }
+        });
+    });
 
-    Models.CampaignSchema
-    .find({ userID: req.user._id})
-    .exec( function(err,campaigns){
-      if(err){
-        console.log(err);
-      } else {
-        if (campaigns.length > 0) {
-          console.log('Found campaigns!!'); 
-          console.log( campaigns);
-        } else {
-          console.log('no campaigns found');
+    // Show One specific campaign
+    app.get('/campaign/:id', ensureAuthenticated, function(req, res, next) {
+        console.log(' --------------------------')
+        console.log(req.protocol + "://" + req.get('host') + req.url)
+        var query = Models.CampaignSchema.findOne({'_id': req.params.id});
+        query.exec(function(err, campaign) {
+            if (err || !campaign)
+                return 'No campaign found with that id';
+            console.log('Found campaign!');
+            console.log(campaign);
+            console.log(req.user);
+
+            var params = campaign;
+            var dirPath = path.join(__dirname, "../uploads/", req.user._id + "", "/")
+            params.user = req.user;
+            params.idd = req.params.id;
+            params.pagetitle = 'View of selected campaign';
+            params.uploadedList = helperFunctions.getUploadedFiles(req, res, next, params, dirPath);
+
+        });
+    });
+    app.get('/uploaded/:id?', redirectAuthenticated, function(req, res, next) {
+        var dirPath = path.join(__dirname, "../uploads/", req.user._id + "", "/");
+        if (req.headers['referer'] && (req.headers['referer'].indexOf('/campaign/' + req.params.id) || req.headers['referer'].indexOf('/add'))) {
+            if (fs.existsSync(dirPath)) { // or fs.existsSync
+                fs.readdir(path.join(__dirname, "../uploads/", req.user._id + "", "/"), function(err, data) {
+                    if (err) {
+                        req.message = JSON.stringify(err);
+                        helperFunctions.showMessage(req, res, next);
+                        console.log(err);
+                    }
+                    var files = [];
+                    if (data) {
+                        for (var i in data) {
+                            files.push({name: data[i], path: req.protocol + "://" + req.get('host') + "/" + req.user._id + "" + "/" + data[i]})
+                        }
+                    }
+                    res.render('uploaded_files', {filelist: files});
+                })
+            } else {
+                res.render('uploaded_files', {filelist: []});
+            }
         }
-        res.render('campaigns',{ user: req.user, campaigns: campaigns });
-      }
-    }
-    );
-  });
+    })
+    app.get('/uploaded/:id', ensureAuthenticated, function(req, res, next) {
+        console.log('start')
+        console.log(req.headers)
+        console.log(req.params)
+        console.log(req.body)
+        var query = Models.CampaignSchema.findOne({'_id': req.params.id});
+        query.exec(function(err, campaign) {
+            if (err || !campaign)
+                return 'No campaign found with that id';
 
-  // Show One specific campaign
-  app.get('/campaign/:id', ensureAuthenticated, function (req,res,next){
+            console.log(campaign);
 
-    console.log('foo');
-    var query = Models.CampaignSchema.findOne({'_id': req.params.id});
-    query.exec(function(err, campaign){
-      console.log('bar');
-
-      if(err) return 'No campaign found with that id';
-      console.log('Found campaign!');
-      console.log(campaign);
-      console.log(req.user);
-
-      var params = campaign;
-      params.user = req.user;
-      res.render('index',  params );
-
-    });
-  });
-
-  // Rendered output for a single campaign that will be used for screenshot
-  app.get('/campaign/render/:id', ensureAuthenticated, function(req,res,next){
-    Models.CampaignSchema
-    .findOne({ '_id': req.params.id})
-    .exec( function(err,campaign){
-      if(err){
-        console.log(err);
-      } else {
-        res.render('render',{user:req.user, campaign: campaign});
-      }
-    }
-    );
-  });
-
-  // Catches the screenshot callback
-  app.post('/screenshotCallback', ensureAuthenticated, function(req,res,next){
-    req.on('end', function(){
-      res.send('foobar');
-
-      res.end();
-    });
-    res.send('bazbaz');
-
-    req.pipe(fs.createWriteStream(path.join( __dirname, '../public/screenshots/foo.png')));
-  });
-
-  // Shows the actual screenshot file for a campaign
-  app.get('/campaign/screenshot/:id?', ensureAuthenticated, function(req,res, next){
-    var url = 'http://localhost:3000/campaign/render/' + req.params.id;
-    // required options
-    var options = {
-      uri: 'http://localhost:' + rasterizerService.getPort() + '/',
-      headers: { url: url }
-    };
-
-    // console.log(rasterizerService.getPort());
-    ['width', 'height', 'clipRect', 'javascriptEnabled', 'loadImages', 'localToRemoteUrlAccessEnabled', 'userAgent', 'userName', 'password', 'delay'].forEach(function(name) {
-      if (req.param(name, false)) options.headers[name] = req.param(name);
-      options.headers['width'] = '1';
-      options.headers['height'] = '1';
+            var params = campaign;
+            params.user = req.user;
+            params.idd = req.params.id;
+            params.pagetitle = 'View of selected campaign';
+            params.uploadedList = '';
+            if (fs.existsSync(dirPath)) {
+                fs.readdir(path.join(__dirname, "../uploads/", req.user._id + "", "/"), function(err, data) {
+                    if (err) {
+                        req.message = JSON.stringify(err);
+                        helperFunctions.showMessage(req, res, next);
+                        console.log(err);
+                    }
+                    var files = [];
+                    if (data) {
+                        for (var i in data) {
+                            files.push(path.join(req.protocol, "/", req.get('host'), "/", req.user._id + "", "/", data[i]))
+                        }
+                    }
+                    params.uploadedList = JSON.stringify(files.join(","));
+                    res.write(JSON.stringify(params.uploadedList));
+                    res.end();
+                    // res.render('index', params);
+                })
+            } else {
+                params.uploadedList = "";
+                res.write("");
+                res.end();
+            }
+        });
     });
 
-    var filename = 'screenshot_' + utils.md5(url + JSON.stringify(options)) + '.png';
-    options.headers.filename = filename;
+    // Rendered output for a single campaign that was used for screenshot
+    app.get('/campaign/render/:id', ensureAuthenticated, function(req, res, next) {
+        Models.CampaignSchema
+                .findOne({'_id': req.params.id})
+                .exec(function(err, campaign) {
+            console.log(campaign)
+            if (err) {
+                if (req) {
+                    req.message = JSON.stringify(err);
+                    helperFunctions.showMessage(req, res, next);
+                }
+                console.log(err);
+            } else {
+                res.render('render', {pagetitle: 'Campaign view', user: req.user, campaign: campaign});
+            }
+        });
+    });
+    app.get('/campaign/viewrender/:id', redirectAuthenticated, function(req, res, next) {
+        Models.CampaignSchema
+                .findOne({'_id': req.params.id})
+                .exec(function(err, campaign) {
+            if (err) {
+                if (req) {
+                    req.message = JSON.stringify(err);
+                    helperFunctions.showMessage(req, res, next);
+                }
+                console.log(err);
+            } else {
+                console.log('??')
+                res.render('render_screenshot', {pagetitle: 'Campaign view', user: req.user, campaign: campaign});
+            }
+        });
+    });
+    app.get('/campaign/generaterender/:id', redirectAuthenticated, function(req, res, next) {
+        Models.CampaignSchema
+                .findOne({'_id': req.params.id})
+                .exec(function(err, campaign) {
+            if (err) {
+                if (req) {
+                    req.message = JSON.stringify(err);
+                    helperFunctions.showMessage(req, res, next);
+                }
+                console.log(err);
+            } else {
+                console.log('??')
+                // if(req.data)
+                //     res.redirect('/campaigns')
+                //else 
+                console.log(campaign)
+                var loc = GLOBAL.address + '/' + campaign.userID + '/screenshot_' + req.params.id;
+                console.log(loc)
+                res.render('render_screenshot', {pagetitle: 'Campaign view', user: req.user, campaign: campaign, imgurl: "<img src='" + loc + "'/>"});
+            }
+        });
+    });
+    // Catches the screenshot callback
+    app.post('/screenshotCallback', ensureAuthenticated, function(req, res, next) {
+        /*req.on('end', function() {
+         res.send('foobar');
+         
+         res.end();
+         });
+         res.send('bazbaz');
+         
+         req.pipe(fs.createWriteStream(path.join(__dirname, '../public/screenshots/foo.png')));*/
+    });
+    // Generates file and img tag   
+    app.get('/campaign/generateurl/:id?', ensureAuthenticated, function(req, res, next) {
+        //  console.log('!!!')
+        //var urlinfo =  GLOBAL.address + '/' + req.user._id + '/screenshot_' + req.params.id;
+        //res.render('campaigns', {pagetitle: 'Your list of campaigns', user: req.user, campaigns: campaigns, urlinfo: urlinfo});
+    })
+    // Shows the actual screenshot file for a campaign
+    app.get('/campaign/screenshot/:id?', ensureAuthenticated, function(req, res, next) {
+        //var url = GLOBAL.address + '/campaign/render/' + req.params.id;
+        Models.CampaignSchema
+                .findOne({'_id': req.params.id})
+                .exec(function(err, campaign) {
+            if (err) {
+                if (req) {
+                    req.message = JSON.stringify(err);
+                    helperFunctions.showMessage(req, res, next);
+                }
+                console.log(err);
+            } else {
+                helperFunctions.printScreenshot(campaign, req, res, next);
+            }
+        });
+    });
 
-    var filePath = join(rasterizerService.getPath(), filename);
+    app.get('/user', ensureAuthenticated, function(req, res) {
+        if (!app.settings.firstLogin) {
+            app.settings.firstLogin = true;
+        }
+        res.render('user', {user: req.user});
+    });
 
-    var callbackUrl = req.param('callback', false) ? utils.url(req.param('callback')) : false;
-    //callbackUrl='http://localhost:3000/screenshotCallback';
-    console.log('callbackURL is now=' + callbackUrl);
+    app.get('/login', function(req, res, next) {
+        res.render('login', {pagetitle: 'Login to your account', message: req.flash('info')});
+    });
 
+    app.get('/logout', function(req, res) {
+        req.logout();
+        app.settings.firstLogin = false;
+        res.redirect('/');
+    });
 
-    if (path.existsSync(filePath)) {
-      console.log('Request for %s - Found in cache', url);
-      processImageUsingCache(filePath, res, callbackUrl, function(err) { if (err) next(err); });
-      return;
+    app.get('/signup', function(req, res, next) {
+        res.render('signup', {pagetitle: 'Sign up', message: req.flash('info')});
+    });
+
+    app.post('/signup', function(req, res, next) {
+        var flag;
+        req.message = {};
+        if (!req.body.password.length) {
+            req.message.pass_message = "Password required.";
+            req.type = 'pass_message';
+            flag = true;
+        }
+        if (!req.body.confirm.length) {
+            req.message.confirm_message = "Password confirmation required.";
+            req.type = 'confirm_message';
+            flag = true;
+        }
+        if (!flag && req.body.confirm != req.body.password) {
+            req.message.confirm_message = "Passwords must match.";
+            req.type = 'confirm_message';
+            flag = true;
+        }
+        if (req.body.name.length < 4) {
+            req.message.name_message = "Name length must have more than three characters.";
+            req.type = 'name_message';
+            flag = true;
+        }
+        if (flag) {
+            helperFunctions.showMessage(req, res, next);
+        } else {
+            Models.UserSchema
+                    .find({username: req.body.name})
+                    .exec(function(err, userdata) {
+                if (err) {
+                    req.message = JSON.stringify(err);
+                    helperFunctions.showMessage(req, res, next)
+                    console.log(err);
+                } else {
+                    if (userdata.length > 0) {
+                        req.message.name_message = "Name allready exist. Choose another username";
+                        req.type = 'name_message';
+                        helperFunctions.showMessage(req, res, next);
+                    } else {
+                        var newUser = new Models.UserSchema({
+                            username: req.body.name,
+                            password: req.body.password});
+                        newUser.save(function(err) {
+                            if (err) {
+                                req.message = JSON.stringify(err);
+                                helperFunctions.showMessage(req, res, next)
+                                console.log(err);
+                            } else {
+                                req.login(newUser, function(error) {
+                                    if (error) {
+                                        throw error;
+                                    }
+                                    if (!app.settings.firstLogin) {
+                                        app.settings.firstLogin = true;
+                                    }
+                                    res.render('user', {user: newUser}); // This route is the home where the user should be connected, or is redirected to /login
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+
+    function getApp() {
+        return app;
     }
-    console.log('Request for %s - Rasterizing it', url);
-    helperFunctions.processImageUsingRasterizer(options, filePath, res, callbackUrl, function(err) { if(err) next(err); });
-  });
 
-
-app.get('/user', ensureAuthenticated, function(req, res){
-  res.render('user', { user: req.user });
-});
-
-app.get('/login', function(req,res,next){
-  res.render('login', {});
-});
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
-
-app.get('/signup', function(req,res){
-  res.render('signup');
-});
-
-app.post('/signup', function(req, res){
-  
-  var newUser = new Models.UserSchema({ 
-    username: req.body.name, 
-    password: req.body.password });
-
-  newUser.save(function (err) {
-    if (err) console.log(err);
-  });
-  res.render('index', {});
-});
+    function redirectAuthenticated(req, res, next) {
+        if (app.settings.firstLogin) {
+            return next();
+        } else {
+            res.redirect('/login');
+        }
+    }
+}
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    } else {
+        res.redirect('/login');
+    }
 }
 
-
-
 passport.serializeUser(function(user, done) {
-  done(null, user.id);
+    done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  // console.log('DeserializeUser')
-
-  helperFunctions.findByID(id, function (err, user) {
-    done(err, user);
-  });
+    helperFunctions.findByID(id, function(err, user) {
+        done(err, user);
+    });
 });
-
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}

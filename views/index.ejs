@@ -1,89 +1,95 @@
 <html>
-
-
 <% include header %>
-
-
 <body>
-	<% include navigation %>
+    <% include navigation %>
 
-<!-- 	<form action="/login" method="post">
-    <div>
-        <label>Username:</label>
-        <input type="text" name="username"/>
-    </div>
-    <div>
-        <label>Password:</label>
-        <input type="password" name="password"/>
-    </div>
-    <div>
-        <input type="submit" value="Log In"/>
-    </div>
-	</form> -->
+    <div id="content">
+        <div id="ad-form">
+            
+            <h1>Create your campaign</h1>
+            
+            <% var title_value = typeof title !== 'undefined'
+            ? "value='" + title + "'"
+                    : ''; %>
+                    <% var body_value = typeof body !== 'undefined' ?  body : 'foo'; %>
+                    <% var idelem = typeof idd !== 'undefined' ? idd : ''; %>
+                    <% var uploadedLi = typeof uploadedList !== 'undefined' ? uploadedList.split(",") : ''; 
+                       uploadedList = [];
+                       for(var i in uploadedLi){
+                            uploadedList.push(uploadedLi[i])
+                       }
+                        uploadedList = uploadedList.join(",");
+                    %>
+                    <script>
+                        window.userid = "<=% user%>";
+                        window.uploadedList =  "<%= uploadedList %> ";
+                        window.idelem = "<%= idelem %> ";
+                    </script>
+                    <form id="form" class="navbar-form pull-left" action="/add" method="post" enctype="multipart/form-data">
+                            <input
+                            name='title'
+                            class="title"
+                            type="text"
+                            placeholder='Title'
+                            <% if(typeof title !== 'undefined') { %>
+                            value="<%= title %>"
+                            <% } %>
+                            ><br/>
+                            <textarea id="CKeditor" name="CKeditor"><%= body_value %></textarea>
+                          
+     			   <!-- <input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/> 
+                            <label class="checkbox">
+                                    <input name="addlogo" type="checkbox"> Use logo
+                            </label>  -->
+                            <input type="text" name="idd" placeholder="idd" value="<%= idelem %>" style="display:none;">
+                        <!--    <input type="text" name='schedule' placeholder="Schedule"><br/>
+                            <input type="text" name='internal_title' placeholder="Internal Title"><br/> -->
+                            <input name="autocheck" type="checkbox"> Auto dimension <br/>
+                            <input type="text" name='ckwidth' placeholder="Ckwidth" 
+                                value="<% if(typeof ckwidth !== 'undefined') { %><%= ckwidth %><% } %>"><span>Container width</span><br/>
+                            <input type="text" name='ckheight' placeholder="Ckheight" 
+                                value="<% if(typeof ckheight !== 'undefined') { %><%= ckheight %><% } %>"><span>Container height</span><br/>
+                            <!--<input type="file" name="image"><br/>-->
+                            <button type="submit"  class="btn">Submit</button>
 
-	<div class="span6" id="ad-form">
-		<h1>Create your campaign</h1>
-		<% var title_value = typeof title !== 'undefined'
-		? "value='" + title + "'"
-		: ''; %>
-		<% var body_value = typeof body !== 'undefined' ?  body : 'foo'; %>
+                            <script type="text/javascript">
+                                initEditor("<%=idelem%>");
+                            </script>
+                    </form>
+            </div>
 
-		<form id="form" class="navbar-form pull-left" action="/add" method="post" enctype="multipart/form-data">
-			<input
-			name='title'
-			class="title"
-			type="text"
-			placeholder='Title'
-			<% if(typeof title !== 'undefined') { %>
-			value="<%= title %>"
-			<% } %>
-			><br/>
+            <div id="preview" class="span6">
+                    <a class="url" data-bind="attr:{href:url}">
+                            <% if(typeof title !== 'undefined') { %>
+                            <h1 class="title" data-bind="text: title"><%= title %></h1>
+                            <% } %>
 
-      <textarea id="CKeditor" name="CKeditor"><%= body_value %></textarea>
-<script type="text/javascript">
-  CKEDITOR.replace( 'CKeditor' );
-</script>
-<!-- 			<input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/>
-			<label class="checkbox">
-				<input name="addlogo" type="checkbox"> Use logo
-			</label>
-			<input type="text" name='schedule' placeholder="Schedule"><br/>
-			<input type="text" name='internal_title' placeholder="Internal Title"><br/>
-			<input type="file" name="image"><br /> -->
-			<button type="submit" class="btn">Submit</button>
-		</form>
-	</div>
-
-
-	<div id="preview" class="span6">
-		<a class="url" data-bind="attr:{href:url}">
-
-			<% if(typeof title !== 'undefined') { %>
-			<h1 class="title" data-bind="text: title"><%= title %></h1>
-			<% } %>
-
-			<% if(typeof body !== 'undefined') { %>
-			<div class="body" data-bind="text: body"><%= body %>
-				<% } %>
-		</a>
-		<% if(typeof _id !== 'undefined') { %>
-		<img id="embedlink"><input type='text' readonly value='<img src="http://localhost:3000/campaign/screenshot/<%= _id %>">' /></form>
-		<% } %>
-
-		</div>
-
-
-		<!--
-		<% if (typeof title !== 'undefined'){ %>
-		<h1 class="title"><%= title %></h1>
-		<% } %>
-		<% if (typeof body !== 'undefined'){ %>
-		<div class="body" ><%= body %></div>
-		<% } %>
-		<% if (typeof imageURL !== 'undefined'){ %>
-		<img src="<% imageURL %>" />
-		<% } %> -->
-	</div>
+                            <% if(typeof body !== 'undefined') { %>
+                                <div class="body" data-bind="text: body"><%= body %>
+                            <% } %>
+                    </a>
+                    <a class="url" data-bind="attr:{href:url}">
+                    <div class="widdth" data-bind="text: widdth"><% if (typeof widdth !== 'undefined'){ %><%= widdth %> <% } %></div>
+                    </a>
+                    <% if(typeof _id !== 'undefined') { %>
+                    <img id="embedlink"><input type='text' readonly value='<img src="<%= global_location %>/campaign/screenshot/<%= _id %>">' /></form> 
+                    <% } %>
+                   
+                    </div>
+                    <div class="clearleft"></div>
+                    <!--
+                    <% if (typeof title !== 'undefined'){ %>
+                    <h1 class="title"><%= title %></h1>
+                    <% } %>
+                    <% if (typeof body !== 'undefined'){ %>
+                    <div class="body" ><%= body %></div>
+                    <% } %>
+                    <% if (typeof imageURL !== 'undefined'){ %>
+                    <img src="<% imageURL %>" />
+                    <% } %> -->
+            </div>
+            <div style="clear:left;"></div>
+        </div>
+    <% include footer %>
 </body>
-<% include footer %>
 </html>

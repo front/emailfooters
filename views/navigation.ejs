@@ -1,5 +1,4 @@
 <div class="navbar navbar-inverse">
-
 	<a href="#" class="scrolltop">
 		<span>up</span>
 	</a>
@@ -13,7 +12,10 @@
 					<span class="icon-bar"></span>
 				</a>
 				<a class="brand scroller" data-section="body" href="/">
-					<img src="/bootstrap/img/logo.png" alt="logo" />
+					<img style="width:50px; height:50px;" src="/bootstrap/img/1369237343_contact.png" alt="logo" />
+                                        <% var title_value = typeof pagetitle !== 'undefined' ?  pagetitle : 'Welcome to Emailfooters'; %>
+                                       
+                                        <span><%= title_value %></span>
 				</a>
 				<div class="nav-collapse collapse">
 					<ul class="nav pull-right">
@@ -23,11 +25,14 @@
 						<% if (typeof user !== 'undefined') { %>
 						<li><a class="btn-header"  href="/user">Hello, <%= user.username %></a></li>
 						<% } else { %>
-						<li><a class="btn-header" href="/login">login</a></li>
+						<li><a class="btn-header" href="/login">Log in</a></li>
 						<% } %>
-
 						<li>
-							<a class="btn-header" href="/signup">Sign up</a>
+                                                    <% if (typeof user === 'undefined') { %>
+                                                        <a class="btn-header" href="/signup">Sign up</a>
+                                                    <% } else { %>
+                                                        <a class="btn-header" href="/logout">Log out</a>
+                                                    <% } %>
 						</li>
 					</ul>
 				</div>
@@ -35,7 +40,4 @@
 		</div>
 	</div>
 	<!-- ends navbar -->
-
-
-
 </div>

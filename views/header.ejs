@@ -1,19 +1,21 @@
 <head>
-<!-- 	<link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
-	<link href="/bootstrap/css/bootstrap.css" rel="stylesheet"/>
-	<link href="/stylesheets/style.css" rel="stylesheet"/> -->
-	<script src="/javascripts/jquery-1.8.3.min.js"></script>
-	<script src="/javascripts/scripts.js"></script>
-	<script src="http://knockoutjs.com/downloads/knockout-2.2.0.js"></script>
-	<script type="text/javascript" src="javascripts/ckeditor/ckeditor.js"></script>
+<!-- 	<link href="<%= global_location%>/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" />
+	<link href="<%= global_location%>/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+	<link href="<%= global_location%>/stylesheets/style.css" rel="stylesheet"/> -->
+	<script src="<%= global_location%>/javascripts/jquery-1.8.3.min.js"></script>
+	<script src="<%= global_location%>/javascripts/scripts.js"></script>
+	<script src="<%= global_location%>/javascripts/knockout-2.2.0.js"></script>
+	<script type="text/javascript" src="<%= global_location%>/javascripts/ckeditor/ckeditor.js"></script>
 
 
-
-	<title>Measure Template</title>
+        <% var title_value = typeof pagetitle != 'undefined' ?  pagetitle : 'Welcome to Emailfooters'; %>
+	<title><%= title_value %></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- Bootstrap -->
-	<link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="/bootstrap/css/theme.css">
-	<link rel="stylesheet" type="text/css" href="/bootstrap/animate.css">
+	<link href="<%= global_location%>/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="<%= global_location%>/bootstrap/css/theme.css">
+	<link rel="stylesheet" type="text/css" href="<%= global_location%>/bootstrap/css/animate.css">
 	<link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="<%= global_location%>/stylesheets/style.css">
+        <link rel="shortcut icon" href="<%= global_location%>/bootstrap/img/1369237360_37110.ico">
 </head>

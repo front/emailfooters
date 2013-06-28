@@ -16,7 +16,6 @@ defaultViewportSize = {
   width: ~~defaultViewportSize[0] || 1024,
   height: ~~defaultViewportSize[1] || 600
 };
-
 var pageSettings = ['javascriptEnabled', 'loadImages', 'localToRemoteUrlAccessEnabled', 'userAgent', 'userName', 'password'];
 
 var server, service;
@@ -72,6 +71,9 @@ service = server.listen(port, function(request, response) {
       width: request.headers.width || defaultViewportSize.width,
       height: request.headers.height || defaultViewportSize.height
     };
+    console.log("==============================")
+    console.log(page.viewportSize.width)
+    console.log(page.viewportSize.height)
     if (request.headers.clipRect) {
       page.clipRect = JSON.parse(request.headers.clipRect);
     }

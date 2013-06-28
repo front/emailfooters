@@ -10,12 +10,14 @@
   }
   </style>
 	<!-- <% include navigation %> -->
-
 	<div id="preview" class="span6">
-		<a class="url" data-bind="attr:{href:url}">
-			<h1 class="title" data-bind="text: title"><%= campaign.title %></h1>
-			<div class="body" data-bind="text: body"><%= campaign.body%></div>
-		</a>
+            <a class="url" data-bind="attr:{href:url}"></a>
+            <h1 class="title" data-bind="text: title"><%= campaign.title %></h1>
+            <div id="body" data-bind="text: body"></div>
+            <textarea id="hiddentextarea" class="hidden"><%= campaign.body %></textarea>
+            <script>
+                $('#body').html($('#hiddentextarea').val());
+            </script>
 	</div>
 </body>
 </html>

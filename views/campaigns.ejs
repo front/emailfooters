@@ -14,10 +14,12 @@
 				<th>Edit</th>
 				<th>Render page</th>
 				<th>Finished screenshot</th>
-
+                                <th>Get URL</th>
+                                <th>Remove</th>
 			</tr>
 		</thead>
 		<% for(var i=0; i<campaigns.length; i++) {%>
+                   <% var urlinfo =  GLOBAL.address + '/' + user._id + '/screenshot_' + campaigns[i]._id;%>
 		<tr>
 			<td><%= campaigns[i].title %></td>
 			<td><%= campaigns[i].body %></td>
@@ -25,12 +27,23 @@
 			<td><%= campaigns[i].image %></td> -->
 			<td><a href="/campaign/<%= campaigns[i]._id %>">Edit</a></td>
 			<td><a href="/campaign/render/<%= campaigns[i]._id %>">View</a></td>
-			<td><a href="/campaign/screenshot/<%= campaigns[i]._id %>">View</a></td>
-
-
+			<td><a href="/campaign/screenshot/<%= campaigns[i]._id %>" target="_blank">Generate</a></td>
+                        <td><a href="javascript:void(0);" onClick="generateUrl('<%= urlinfo %>', '<%= campaigns[i]._id %>');">View</a></td>
+                        <td><a href="/campaign/delete/<%= campaigns[i]._id %>">Delete</a></td>
 		</tr>
 		<% } %>
+        
+
 	</table> 
+<div id="openModal" class="modalDialog hidden">
+            <div>
+                <a href="javascript:void(0);" title="Close" class="close">X</a>
+                <div class="content">
+                    <div>Copy your footer URL:</div>
+                    <input class="inpdata" type="text" onClick="this.select();" value="" />
+                </div>
+            </div>
+        </div>
 </body>
 <% include footer %>
 </html>
