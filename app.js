@@ -1,27 +1,31 @@
+/* jshint esnext: true, strict: true, node: true */
+
+'use strict';
+
 /**
  * Module dependencies.
  */
-var domain = 'localhost'
-  , protocol = 'http'
-  , view_port = 3000;
+var domain = 'localhost',
+    protocol = 'http',
+    view_port = 3000;
 
 GLOBAL.domain = domain;
 GLOBAL.location = protocol + '://' + domain;
 GLOBAL.address = protocol + '://' + domain + ':' + view_port;
 
-var express = require('express')
-  , routes = require('./routes')
-  , http = require('http')
-  , path = require('path')
-  , config = require('config')
-  , request = require('request')
-  , util = require('util')
-  , RasterizerService = require('./lib/rasterizerService')
-  , FileCleanerService = require('./lib/fileCleanerService')
-  , flash = require('connect-flash')
-  , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
-  , helperFunctions = require('./routes/helperFunctions');
+var express = require('express'),
+    routes = require('./routes'),
+    http = require('http'),
+    path = require('path'),
+    config = require('config'),
+    request = require('request'),
+    util = require('util'),
+    RasterizerService = require('./lib/rasterizerService'),
+    FileCleanerService = require('./lib/fileCleanerService'),
+    flash = require('connect-flash'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy,
+    helperFunctions = require('./routes/helperFunctions');
 
 
 // var MongoStore = require('connect-mongo')(config);
