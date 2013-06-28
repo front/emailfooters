@@ -6,17 +6,17 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
-    "express": ">=3.0.1",
-    "mongoose": ">=3.5.2",
-    "mongoose-auth": ">=0.0.12",
-    "ejs": ">=0.8.3",
-    "request": "*",
-    "config": "*",
-    "passport": "0.1.15",
+    "connect-flash": "0.1.1",
+    "ejs": "0.8.3",
+    "should": "1.2.2",
+    "yaml": "0.2.3",
+    "config": "0.4.15",
+    "express": "3.0.1",
+    "mongoose": "3.5.2",
+    "jade": "0.27.7",
+    "mongoose-auth": "0.0.12",
+    "passport": "0.1.17",
     "passport-local": "0.1.6",
-    "connect-flash": "*",
-    "yaml": "*",
-    "should": "*"
+    "request": "2.9.153"
   }
 }
-
