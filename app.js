@@ -1,5 +1,4 @@
 /* jshint esnext: true, strict: true, node: true */
-
 'use strict';
 
 /**
