@@ -1,0 +1,8 @@
+{
+    "domain" : "node.nextlogic.ro",
+    "protocol" : "http",
+    "view_port" : "3000",
+    "location": "http://node.nextlogic.ro",
+    "address": "http://node.nextlogic.ro:3000",
+    "connection1": "mongodb://root:root@node.nextlogic.ro"
+}

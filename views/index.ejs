@@ -1,92 +1,75 @@
-<html>
+<html ng-app="ngSanitize">
 <% include header %>
 <body>
     <% include navigation %>
 
-    <div id="content">
-        <div id="ad-form">
+    <div id="content" ng-controller="EditDetailCtrl">
+        <% var title_value = typeof title !== 'undefined'
+                    ? "value='" + title + "'"
+                            : ''; %>
+        <% var body_value = typeof body !== 'undefined' ?  body : 'foo'; %>
+        <% var idelem = typeof idd !== 'undefined' ? idd : ''; %>
+        <% var uploadedLi = typeof uploadedList !== 'undefined' ? uploadedList.split(",") : ''; 
+           uploadedList = [];
+           for(var i in uploadedLi){
+               uploadedList.push(uploadedLi[i])
+           }
+           uploadedList = uploadedList.join(",");
+        %>
+        <% var title = typeof title !== 'undefined' ? title : ''; %>
+        <% var ckwidth = typeof ckwidth !== 'undefined' ? ckwidth : ''; %>
+        <% var ckheight = typeof ckheight !== 'undefined' ? ckheight : ''; %>
+       
+        <div id="ad-form" ng-init="idelem= '<%= idelem %>'; uploadedList = '<%= uploadedList %>'"  ng-model="idelem">
             
             <h1>Create your campaign</h1>
-            
-            <% var title_value = typeof title !== 'undefined'
-            ? "value='" + title + "'"
-                    : ''; %>
-                    <% var body_value = typeof body !== 'undefined' ?  body : 'foo'; %>
-                    <% var idelem = typeof idd !== 'undefined' ? idd : ''; %>
-                    <% var uploadedLi = typeof uploadedList !== 'undefined' ? uploadedList.split(",") : ''; 
-                       uploadedList = [];
-                       for(var i in uploadedLi){
-                            uploadedList.push(uploadedLi[i])
-                       }
-                        uploadedList = uploadedList.join(",");
-                    %>
-                    <script>
-                        window.userid = "<=% user%>";
-                        window.uploadedList =  "<%= uploadedList %> ";
-                        window.idelem = "<%= idelem %> ";
-                    </script>
-                    <form id="form" class="navbar-form pull-left" action="/add" method="post" enctype="multipart/form-data">
-                            <input
-                            name='title'
-                            class="title"
-                            type="text"
-                            placeholder='Title'
-                            <% if(typeof title !== 'undefined') { %>
-                            value="<%= title %>"
-                            <% } %>
+                     
+                    <form id="form" class="navbar-form pull-left" action="/add" method="post" enctype="multipart/form-data" >
+                           
+                            <input class="title" type="text" name="title" ng-init="title= '<%= title %>'"
+                                 <% if(typeof title !== 'undefined') { %>
+                                    value="<%= title %>"
+                                 <% } %> ng-model="title" 
                             ><br/>
-                            <textarea id="CKeditor" name="CKeditor"><%= body_value %></textarea>
+                            <textarea id="CKeditor" name="CKeditor" ng-model="body_value" ng-init="body_value= '<%= body_value %>'"><%= body_value %></textarea>
                           
      			   <!-- <input 		name='url' 		class='url' 	type='text' placeholder="URL"><br/> 
                             <label class="checkbox">
                                     <input name="addlogo" type="checkbox"> Use logo
                             </label>  -->
                             <input type="text" name="idd" placeholder="idd" value="<%= idelem %>" style="display:none;">
-                        <!--    <input type="text" name='schedule' placeholder="Schedule"><br/>
-                            <input type="text" name='internal_title' placeholder="Internal Title"><br/> -->
+                       
                             <input name="autocheck" type="checkbox"> Auto dimension <br/>
-                            <input type="text" name='ckwidth' placeholder="Ckwidth" 
+                            <input type="text" name='ckwidth' ng-init="ckwidth= '<%= ckwidth %>'" ng-model="ckwidth" 
                                 value="<% if(typeof ckwidth !== 'undefined') { %><%= ckwidth %><% } %>"><span>Container width</span><br/>
-                            <input type="text" name='ckheight' placeholder="Ckheight" 
+                            <input type="text" name='ckheight' ng-init="ckheight= '<%= ckheight %>'" ng-model="ckheight" 
                                 value="<% if(typeof ckheight !== 'undefined') { %><%= ckheight %><% } %>"><span>Container height</span><br/>
-                            <!--<input type="file" name="image"><br/>-->
                             <button type="submit"  class="btn">Submit</button>
 
                             <script type="text/javascript">
-                                initEditor("<%=idelem%>");
+                                initEditor();
                             </script>
                     </form>
             </div>
 
             <div id="preview" class="span6">
-                    <a class="url" data-bind="attr:{href:url}">
+                    <a class="url" >
                             <% if(typeof title !== 'undefined') { %>
-                            <h1 class="title" data-bind="text: title"><%= title %></h1>
+                            <h1 class="title" ng-bind="title"><%= title %></h1>
                             <% } %>
 
-                            <% if(typeof body !== 'undefined') { %>
-                                <div class="body" data-bind="text: body"><%= body %>
+                            <% if(typeof body_value !== 'undefined') { %>
+                                <div class="body" ng-bind-html="body_value">
                             <% } %>
                     </a>
-                    <a class="url" data-bind="attr:{href:url}">
-                    <div class="widdth" data-bind="text: widdth"><% if (typeof widdth !== 'undefined'){ %><%= widdth %> <% } %></div>
-                    </a>
-                    <% if(typeof _id !== 'undefined') { %>
+                    <div class="widdth" ng-bind="ckwidth"><% if (typeof ckwidth !== 'undefined'){ %><%= ckwidth %> <% } %></div>
+
+                 <!--   <% if(typeof _id !== 'undefined') { %>
                     <img id="embedlink"><input type='text' readonly value='<img src="<%= global_location %>/campaign/screenshot/<%= _id %>">' /></form> 
                     <% } %>
-                   
+                   -->
                     </div>
                     <div class="clearleft"></div>
-                    <!--
-                    <% if (typeof title !== 'undefined'){ %>
-                    <h1 class="title"><%= title %></h1>
-                    <% } %>
-                    <% if (typeof body !== 'undefined'){ %>
-                    <div class="body" ><%= body %></div>
-                    <% } %>
-                    <% if (typeof imageURL !== 'undefined'){ %>
-                    <img src="<% imageURL %>" />
-                    <% } %> -->
             </div>
             <div style="clear:left;"></div>
         </div>

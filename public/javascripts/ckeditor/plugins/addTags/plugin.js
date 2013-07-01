@@ -30,7 +30,7 @@
                                     type: 'html',
                                     html: '<p>' + 'List of uploaded files: '
                                             + '<ul>'+(function(){ 
-                                                    var v = window.uploadedList.replace(/&quot;/g, '').split(","), temp = [];
+                                                    var v = CKEDITOR.uploadedList.replace(/&quot;/g, '').split(","), temp = [];
                                                     for(var i in v){
                                                         temp.push('<li>'+v[i]+'</li>')
                                                     }
