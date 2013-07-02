@@ -20,27 +20,27 @@ process.on('uncaughtException', function(err) {
 });
 
 process.on('SIGTERM', function() {
-    process.exit(0);
+  process.exit(0);
 });
 
 process.on('SIGINT', function() {
-    process.exit(0);
+  process.exit(0);
 });
 
 app.configure(function() {
-    app.set('port', process.env.PORT || 3000);
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'ejs');
-    app.use(express.favicon());
-    // app.use(express.logger());
-    app.use(express.cookieParser());
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
+  app.set('port', process.env.PORT || 3000);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'ejs');
+  app.use(express.favicon());
+  // app.use(express.logger());
+  app.use(express.cookieParser());
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
 
     app.use(express.session({
         secret: 'keyboard cat',
         maxAge: new Date(Date.now() + 3600000)
-    }));
+  }));
     // passport setup. These needs to be *before*   app.use(app.router);
     app.use(flash());
     app.use(passport.initialize());
@@ -56,10 +56,9 @@ app.configure(function() {
     };
 });
 app.configure('development', function() {
-    app.use(express.errorHandler());
+  app.use(express.errorHandler());
 });
 require('./routes')(app);
-
 
 zserver = http.createServer(app);
 zserver.listen(app.get('port'), function(a, b) {

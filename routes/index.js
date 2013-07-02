@@ -11,10 +11,11 @@ var CampaignModel = require('../models/Campaign'),
         fileCleanerService, rasterizerService, retrApp;
 
 module.exports.fileCleanerService = function() {
-    return fileCleanerService;
+  return fileCleanerService;
 };
+
 module.exports.rasterizerService = function() {
-    return rasterizerService;
+  return rasterizerService;
 };
 module.exports.retrApp = function() {
     return retrApp;
@@ -66,12 +67,12 @@ module.exports = function(app) {
     });
     app.get('/campaign/delete/:id', helperFunctions.ensureAuthenticated, function(req, res, next) {
         helperFunctions.removeCampaign(req.user._id, req.params.id, function(err, newUser) {
-            if (err) {
+          if (err) {
                 req.message = JSON.stringify(err);
                 helperFunctions.showMessage(req, res, next);
                 console.log(err);
-            } else {
-                var imagePath = path.join(__dirname, "../imgurl/", req.user._id + "", "/", "screenshot_" + req.params.id);
+          } else {
+                var imagePath = path.join(__dirname, '../imgurl/', req.user._id + '', '/', 'screenshot_' + req.params.id);
                 if (fs.existsSync(imagePath)) {
                     fs.unlink(imagePath, function(err) {
                         if (err) {
@@ -114,15 +115,15 @@ module.exports = function(app) {
     // Campaign list
     app.get('/campaigns', helperFunctions.ensureAuthenticated, function(req, res, next) {
         helperFunctions.findCampaign(req.user._id, req.params.id, "last_updated -1", function(err, campaigns) {
-            if (err) {
+          if (err) {
                 req.message = JSON.stringify(err);
                 helperFunctions.showMessage(req, res, next);
                 console.log(err);
-            } else {
+          } else {
                 res.render('campaigns', {pagetitle: 'Your list of campaigns', user: req.user, campaigns: campaigns});
-            }
+          }
         })
-    });
+  });
 
     // Show One specific campaign
     app.get('/campaign/:id', helperFunctions.ensureAuthenticated, function(req, res, next) {
@@ -197,47 +198,58 @@ module.exports = function(app) {
                     res.end();
                 }
             }
+          }
+          params.uploadedList = JSON.stringify(files.join(','));
+          res.write(JSON.stringify(params.uploadedList));
+          res.end();
+          // res.render('index', params);
         });
+      } else {
+        params.uploadedList = '';
+        res.write('');
+        res.end();
+      }
     });
+  });
 
     // Rendered output for a single campaign that was used for screenshot
     app.get('/campaign/render/:id', helperFunctions.ensureAuthenticated, function(req, res, next) {
         helperFunctions.findCampaign(null, req.params.id, function(err, campaign) {
             if (err) {
                 if (req) {
-                    req.message = JSON.stringify(err);
-                    helperFunctions.showMessage(req, res, next);
+              req.message = JSON.stringify(err);
+              helperFunctions.showMessage(req, res, next);
                 }
                 console.log(err);
-            } else {
+          } else {
                 res.render('render', {pagetitle: 'Campaign view', user: req.user, campaign: campaign[0]});
-            }
+          }
         });
     });
     app.get('/campaign/viewrender/:id', helperFunctions.redirectAuthenticated, function(req, res, next) {
         helperFunctions.findCampaign(null, req.params.id, function(err, campaign) {
-            if (err) {
+          if (err) {
                 if (req) {
-                    req.message = JSON.stringify(err);
-                    helperFunctions.showMessage(req, res, next);
+              req.message = JSON.stringify(err);
+              helperFunctions.showMessage(req, res, next);
                 }
                 console.log(err);
             } else {
                 res.render('render_screenshot', {pagetitle: 'Campaign view', user: req.user, campaign: campaign[0]});
-            }
+          }
         });
     });
     app.get('/campaign/generaterender/:id', helperFunctions.redirectAuthenticated, function(req, res, next) {
         helperFunctions.findCampaign(null, req.params.id, function(err, campaign) {
-            if (err) {
+          if (err) {
                 if (req) {
-                    req.message = JSON.stringify(err);
-                    helperFunctions.showMessage(req, res, next);
+              req.message = JSON.stringify(err);
+              helperFunctions.showMessage(req, res, next);
                 }
                 console.log(err);
             } else {
                 res.render('render_screenshot', {pagetitle: 'Campaign view', user: req.user, campaign: campaign[0]});
-            }
+          }
         });
     });
     // Catches the screenshot callback
@@ -251,17 +263,17 @@ module.exports = function(app) {
     // Shows the actual screenshot file for a campaign
     app.get('/campaign/screenshot/:id?', helperFunctions.ensureAuthenticated, function(req, res, next) {
         helperFunctions.findCampaign(null, req.params.id, function(err, campaign) {
-            if (err) {
+          if (err) {
                 if (req) {
-                    req.message = JSON.stringify(err);
-                    helperFunctions.showMessage(req, res, next);
+              req.message = JSON.stringify(err);
+              helperFunctions.showMessage(req, res, next);
                 }
                 console.log(err);
-            } else {
+          } else {
                 helperFunctions.printScreenshot(campaign[0], req, res, next);
-            }
+          }
         });
-    });
+  });
 
     app.get('/user', helperFunctions.ensureAuthenticated, function(req, res) {
         if (!app.settings.firstLogin) {
@@ -271,9 +283,9 @@ module.exports = function(app) {
         res.render('user', {user: req.user});
     });
 
-    app.get('/login', function(req, res, next) {
-        res.render('login', {pagetitle: 'Login to your account', message: req.flash('info')});
-    });
+  app.get('/login', function(req, res, next) {
+    res.render('login', {pagetitle: 'Login to your account', message: req.flash('info')});
+  });
 
     app.get('/logout', function(req, res) {
         req.logout();
@@ -282,9 +294,9 @@ module.exports = function(app) {
         res.redirect('/');
     });
 
-    app.get('/signup', function(req, res, next) {
-        res.render('signup', {pagetitle: 'Sign up', message: req.flash('info')});
-    });
+  app.get('/signup', function(req, res, next) {
+    res.render('signup', {pagetitle: 'Sign up', message: req.flash('info')});
+  });
 
     app.post('/signup', function(req, res, next) {
         var flag;
@@ -314,6 +326,20 @@ module.exports = function(app) {
         } else {
             helperFunctions.findByUsername(req.body.name, function(err, userdata) {
                 if (err) {
+              req.message = JSON.stringify(err);
+              helperFunctions.showMessage(req, res, next);
+              console.log(err);
+                } else {
+              if (userdata.length > 0) {
+                req.message.name_message = 'Name allready exist. Choose another username';
+                req.type = 'name_message';
+                helperFunctions.showMessage(req, res, next);
+              } else {
+                var newUser = new Models.UserSchema({
+                  username: req.body.name,
+                  password: req.body.password});
+                newUser.save(function(err) {
+                  if (err) {
                     req.message = JSON.stringify(err);
                     helperFunctions.showMessage(req, res, next);
                     console.log(err);
